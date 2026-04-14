@@ -1,37 +1,41 @@
 ---
 title: "GitHub as the Nervous System"
 date: 2026-04-14
-description: "Why every engagement I take on starts with a GitHub repo — and what that discipline actually buys you."
+description: "Why every engagement starts with a repo."
 ---
 
-Every engagement I take on starts the same way. Before the kickoff call is over, there's a GitHub repo. Before I've written a single deliverable, the context is committed.
+As I'm forced to switch context often and messages are bombarded to me via messages, emails and phone calls, I've learned to maintain context by putting every engagement I take into a private github repo for organisation. 
 
-This isn't a preference or a habit. It's a structural decision with real consequences for how work goes.
+## Why version control matters outside of software
 
-## What a repo actually is
+Although Git was built for code, the problem it solves isn't code — it's a knowledge problem.
 
-A git repo isn't a file storage location. It's a timeline. Every decision that gets committed has a timestamp, an author, and a message. Every file that changes can be diffed against what it was before. Every conversation that results in a direction change can be traced.
+Over the life of a project/engaegment, work accumulates. Decisions get made, context shifts, people move on. Without a record, I'm left reconstructing what happened and why often. In software that's painful. In consulting it's fatal — because the output *is* the thinking, and thinking disappears fast.
 
-In consulting, this matters more than in software development — because in software, the code *is* the output. In consulting, the output is advice, documents, and decisions. Those are easy to lose. A repo is the discipline that stops you losing them.
+The repo fixes that. Every decision has a timestamp. Every change can be diffed. Every direction change leaves a trace. It's not documentation you write after the fact. It's a continuous record of work as it happens.
 
-## The practical pattern
+## Why it matters even more for AI
 
-Every engagement gets its own repo with a consistent structure: a `deliverables/` folder for final outputs, a `notes/` folder for working material, a `memory/` folder for what Claude needs to know about the engagement, and a `CLAUDE.md` that wires up the project context automatically.
+As I'm using AI more and more, I've learned it helps AI too. AI tools have no memory between sessions. Every time you open a new conversation, you're starting from zero — unless you've built somewhere for the context to live.
 
-The `CLAUDE.md` pattern is the piece I get asked about most. At the top, it references my identity document — a 200-line file that describes how I think, what I've learned, and what I don't do. Below that, the engagement specifics: the client context, the deliverables list, the relevant constraints.
+The repo solves this problem structurally. The client context, the decisions already made, the constraints that matter — it all lives in the repo. AI can read from it at the start of every session. It already knows where things stand.
 
-When I open the repo, that's all there — without me having to re-establish it. The tool already knows what it needs to know.
+Without that, you're spending the first ten minutes of every session re-establishing context you've already established before. With it, you pick up exactly where you left off. The repo stops being passive storage and becomes the memory layer for everything — human and AI alike.
 
-## What it buys you
+## How I set it up
 
-**Continuity across sessions.** Each session picks up where the last one ended. No "what did we decide last time?" No reconstructing context from memory.
+Every engagement gets the same structure: `deliverables/` for outputs, `notes/` for working material, `memory/` for what the AI needs to know, and a `CLAUDE.md` at the root that wires it all together.
 
-**Decisions as artefacts.** When a client asks "why did we do it this way?" — the answer is in the commit history. Not in someone's head or a Slack thread.
+That last file is the important one. It references my identity document at the top — how I think, what I've learned, what I don't do. Below that, the engagement specifics: client context, open decisions, relevant constraints.
 
-**Handoff that actually works.** When a project transitions to another person or team, the repo *is* the handoff. The decisions are documented. The context is present. There's no hidden knowledge to extract.
+When I open the project, Claude reads it automatically. No re-establishing context. No "remind me where we were."
 
-## The deeper principle
+## What it buys
 
-If you're advising clients to treat their infrastructure as code — version-controlled, auditable, automated — you should be able to show what that looks like for the way you work.
+Continuity across sessions — the repo is the memory, because AI tools have none by default.
 
-The repo isn't overhead. It's the work.
+Decisions as artefacts — when a client asks why we did something, the answer is in the commit history. Not reconstructed from memory months later.
+
+Handoffs that actually work — the repo is the handoff. The context is there. No knowledge extraction required.
+
+The repo isn't overhead, it's my nervous system.
