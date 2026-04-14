@@ -1,0 +1,66 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const siteTitle = title === 'Kiran Busi' ? 'Kiran Busi' : `${title} — Kiran Busi`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{siteTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={siteTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="Kiran Busi" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={siteTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div class="site-wrap">
+      <header>
+        <nav class="site-nav">
+          <a href="/" class="site-nav__name">Kiran Busi</a>
+          <ul class="site-nav__links">
+            <li><a href="/writing" aria-current={Astro.url.pathname.startsWith('/writing') ? 'page' : undefined}>Writing</a></li>
+            <li><a href="/system" aria-current={Astro.url.pathname === '/system' ? 'page' : undefined}>System</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <main>
+        <slot />
+      </main>
+
+      <footer class="site-footer">
+        <span>Kiran Busi</span>
+        <span>
+          <a href="https://linkedin.com/in/kiran-busi" target="_blank" rel="noopener">LinkedIn</a>
+          &nbsp;·&nbsp;
+          Melbourne, Australia
+        </span>
+      </footer>
+    </div>
+  </body>
+</html>
+
