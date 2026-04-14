@@ -1,6 +1,6 @@
-# notes.busilogic.com
+# notes.kiranbusi.com
 
-Personal thought leadership site. Built with [Astro](https://astro.build), deployed to GitHub Pages at [notes.busilogic.com](https://notes.busilogic.com).
+Personal thought leadership site. Built with [Astro](https://astro.build), deployed to GitHub Pages at [notes.kiranbusi.com](https://notes.kiranbusi.com).
 
 ---
 
@@ -62,7 +62,7 @@ Automatic. Push to `master` → GitHub Actions builds and deploys to GitHub Page
 
 The workflow is at `.github/workflows/deploy.yml`. GitHub Pages must be configured to use **GitHub Actions** as the source (not a branch) in the repo settings.
 
-**DNS**: A CNAME record at the domain registrar must point `notes.busilogic.com → busilogic.github.io`.
+**DNS**: A CNAME record at the domain registrar must point `notes.kiranbusi.com → busilogic.github.io`.
 
 ---
 
