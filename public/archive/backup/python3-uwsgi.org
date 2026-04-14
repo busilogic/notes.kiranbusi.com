@@ -1,0 +1,59 @@
+#+SETUPFILE: /Users/kbusi/Devel/org-html-themes/setup/theme-readtheorg.setup
+#+TITLE: Python 3 Uwsgi
+-----
+
+* Create a virtual environment using Python3
+- Find python3 path
+#+BEGIN_SRC sh
+which python3
+#+END_SRC
+
+- Create a virtual environment using python3
+#+BEGIN_SRC sh
+virtualenv --python=/usr/local/bin/python3 <venv_name>
+#+END_SRC
+
+- Activate virtualenv
+
+  On freebsd, you have use the activate.csh as corn shell is the default shell
+#+BEGIN_SRC sh
+source venv/bin/activate.csh
+#+END_SRC
+
+
+* Install the code
+** Add your ssh public key to bitbucket deployment keys
+   This allows the hosting machine to read the code repo
+
+
+** Install packages to the virtual environment using pip
+   #+BEGIN_SRC sh
+   pip install -r requirements.txt
+   #+END_SRC
+
+- Note: Install uwsgi into virtual env so packages for project are recgonized
+  If you are using system installed uwsgi, flask won't be recognized.
+
+
+** Create a wsgi file
+https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps
+
+*** Generate flask secret key in python 3
+
+    #+BEGIN_SRC python
+    import binascii
+    binascii.hexlify(os.urandom(24))    
+    #+END_SRC
+- https://gist.github.com/geoffalday/2021517
+
+
+** Create a production.ini file
+http://darrencree.com/uwsgi.html
+
+** Update supervisord.conf
+http://www.michielovertoom.com/freebsd/flask-gunicorn-nginx-supervisord/
+
+
+
+
+

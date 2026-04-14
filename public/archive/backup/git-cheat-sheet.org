@@ -1,0 +1,93 @@
+#+SETUPFILE: /Users/kbusi/devel/org-html-themes/setup/theme-readtheorg.setup
+#+TITLE: Git Cheat Sheet
+
+-----
+
+- Some git commands I find myself looking up over and over again.
+
+-----
+
+* Writing good git commit messages
+  - http://chris.beams.io/posts/git-commit/
+
+
+* Git Commands
+
+- Set remote origin URL 
+  #+BEGIN_SRC sh 
+  git remote set-url origin <git url.git>
+  #+END_SRC
+
+
+- Remove file already being tracked by git
+#+BEGIN_SRC sh
+ git rm --cached <file> 
+#+END_SRC
+
+
+- Ignore file with certain extension
+
+      - Add to .gitignore. (ex: *.pyc)
+
+
+* Magit
+  If you use emacs & you use git, I haven't found a better tool than magit.
+  Magit is git interface for emacs so you can edit the code, check it into git
+  and push upstream without ever leaving the editor.
+
+** Setup Magit
+
+- Easiest way is to use the built in package manager.
+
+  #+BEGIN_SRC emacs-lisp
+  ;; magit
+  M-x package-install RET magit RET
+  (require 'magit)
+  #+END_SRC
+  
+
+** magit cheat sheet
+
+- invoke magit buffer 
+
+  #+BEGIN_SRC emacs-lisp
+  M-x g
+  #+END_SRC
+
+- refresh magit buffer
+  #+BEGIN_SRC emacs-lisp
+  g
+  #+END_SRC
+
+
+- Capital S to stage everything under changes
+
+  #+BEGIN_SRC emacs-lisp
+  S
+  #+END_SRC
+
+
+- commit
+
+  #+BEGIN_SRC emacs-lisp
+  c
+  #+END_SRC
+
+
+- Type log message in open buffer & enter:
+
+  #+BEGIN_SRC emgacs-lisp
+  C-c C-c
+  #+END_SRC
+
+
+- push changes
+  #+BEGIN_SRC emacs-lisp
+  P   ; push changes
+  #+END_SRC
+
+
+- If magit keeps firing up a new window
+  #+BEGIN_SRC emacs-lisp
+  (set-variable 'magit-emacsclient-executable "<path_to_emacs_client>") 
+  #+END_SRC

@@ -1,0 +1,183 @@
+#+SETUPFILE: /Users/kbusi/Devel/org-html-themes/setup/theme-readtheorg-local.setup
+#+TITLE: Postgres notes 
+------
+
+* Install Django project on Ubuntu 16
+** Install virtualenv 
+   https://askubuntu.com/questions/244641/how-to-set-up-and-use-a-virtual-python-environment-in-ubuntu
+
+** Create database user and password
+   Similar to what is used in local dev postgres
+
+** Checkout project to Local machine
+** Run pip install requirements
+** Test it works 
+   run ./manage.py runserevr 0.0.0.0 8000
+   allow port 8000 in firewall - ufw allow 8000
+   Go to ip:8000 in browser - should work
+   Don't forget to turn off firewall
+   ufw deny 8000
+
+** Create nginx conf file
+** Create ini file
+** Symlink nginx conf in project to /etc/nginx/sites-enabled/
+** symlink ini file to /etc/uwsgi/apps-enabled/
+   If no uwsgi, install using apt
+   apt install uwsgi
+
+** Try manually running uwsgi 
+   uwsgi --ini uwsgi-file-name.ini
+   Errors will show up there
+
+** If you get 
+   -- unavailable modifier requested: 0 --
+   Might have to install uwsgi-plugin-python apt install uwsgi-plugin-python
+   Add plugins=python to your ini file
+   https://stackoverflow.com/questions/10748108/nginx-uwsgi-unavailable-modifier-requested-0
+
+   https://stackoverflow.com/questions/20176959/uwsgi-no-request-plugin-is-loaded-you-will-not-be-able-to-manage-requests
+   
+
+** make sure names of sock files are aligned
+** Check nginx log files error.log
+** Check /var/log/uwsgi/ folder for uwsgi logs
+
+
+* Django + Nginx + Uwsgi
+** fireup new server
+** create a user
+
+       - setup password
+
+*** add user to sudo group
+    - on debian, install sudo first
+      - sudo apt-get install sudo
+    - create home directory
+    - might have to add permissions of user to home directory
+** create a virtual env 
+   - install pip via python-pip pkackage
+   - use pip to install virtualenv
+   - add ssh key to git repo so server can do a git pull
+   - Init DB
+  
+** Levergae fabric to automate deployments
+** Optional: Setup cron job for django-yubin 
+
+* Deleting Packages installed via python setup.py install
+  
+- When you install packages not using a package manager, you have to remove
+  the files manually and undo any changes the installation did manually.
+
+- It's much easier if you record the list of all files bby reinstalling with
+  an option.
+
+  #+BEGIN_SRC sh
+  > python setup.py install --record files.txt
+  #+END_SRC
+
+-  Once you want to uninstall you can use xargs to do the removal:
+  #+BEGIN_SRC sh
+  > cat files.txt | xargs rm -rf
+  #+END_SRC
+
+
+* Using South on Existing Django Project
+** install south
+
+       #+BEGIN_SRC python
+         pip install south
+       #+END_SRC 
+
+** add south to settings.py
+
+       #+BEGIN_SRC python
+           INSTALLED_APPS = (
+               ...
+               'south',
+               ...
+           )
+       #+END_SRC
+
+** Run syncdb so south tables get created
+
+       #+BEGIN_SRC python
+           python manage.py syncdb
+       #+END_SRC
+
+** Convert Existing app to Django South
+       #+BEGIN_SRC python
+           python manage.py convert_to_south myproject.myapp
+       #+END_SRC
+
+
+** Change the models & then
+#+BEGIN_SRC python
+python manage.py schemamigration myproject.myapp --auto
+python manage.py migrate myproject.myapp
+#+END_SRC
+
+** Verify your DB has Changed and your app starts like usual.
+
+** Troubleshooting
+*** All data is stored in the migrations folder.
+*** Delete the migrations folder in your app to start again with Django South
+
+
+* django using gunicorn
+** Install gunicorn in your virtual environment
+
+#+BEGIN_SRC sh
+pip install gunicorn
+#+END_SRC
+
+** Add gunicorn as an app in your settings.py
+   
+** test it locally
+
+#+BEGIN_SRC sh
+$ ./manage.py run_gunicorn
+#+END_SRC
+
+or
+
+#+BEGIN_SRC sh
+$ gunicorn_django -b 0.0.0.0:8000
+#+END_SRC
+
+
+
+
+
+
+
+
+* Debugging Python/Django
+  #+BEGIN_SRC python
+  # put this line where you want to get a break
+  import pdb; pdb.set_trace()  
+  #+END_SRC
+  - then run the server ex: manage.py runserver -p 8888
+
+  - Go to page with your web browser (enter the address of
+  the host or localhost if the server is running on same computer of your web
+  browser) and add the port (ie. http://localhost:8888 ). Your done, once you go
+  to the page where the set_trace() method is read, the server will break at this
+  position and the terminal where you run the server will show you the prompt,
+  allowing you to go trough your code and variable
+
+  #+ATTR_HTML: :border 2 solid lightgray :rules all :frame border :class striped table-striped
+  | Command  | Short form | Description                                           |
+  |----------+------------+-------------------------------------------------------|
+  | break    | b          | Set a breakpoint                                      |
+  | continue | c          | Continue with program execution                       |
+  | exit     | q          | Abort the program                                     |
+  | help     | h          | Print list of commands or help for given command      |
+  | list     | l          | Show source code around current line                  |
+  | return   | r          | Continue execution until the current function returns |
+  |          |            |                                                       |
+
+
+
+* Python Links I keep on coming back to
+
+- [[http://strftime.org/][Formatting Date String]]

@@ -1,0 +1,237 @@
+#+SETUPFILE: /Users/kbusi/Devel/org-html-themes/setup/theme-readtheorg-local.setup
+#+TITLE: Postgres notes 
+------
+
+
+* Installation
+** On Ubuntu
+   #+BEGIN_SRC sh
+   sudo apt-get install postgresql postgresql-contrib
+   #+END_SRC
+
+** On Mac
+   #+BEGIN_SRC sh
+   brew update 
+   brew doctor
+   brew install postgres
+   #+END_SRC
+
+
+
+* Manage DB on Ubuntu
+#+BEGIN_SRC sh
+
+# Connect to fresh postgres installation
+$ sudo -u postgres psql postgres
+
+# Create new role with password
+$ postgres=# create role USER with encrypted password 'TOPSECRET';
+
+# Create database with owner 
+$ postgres=# create database DBNAME with owner USER;
+
+# grant login permissions to db user
+postgres=# alter role USER with LOGIN;
+#+END_SRC
+
+- Links: https://help.ubuntu.com/community/PostgreSQL
+
+
+* Manage DB on Mac
+#+BEGIN_SRC sh
+
+# connect to postgres 
+$ psql -d postgres
+
+- https://coderwall.com/p/zf-fww/postgres-on-osx-with-homebrew-not-running-after-osx-crash
+
+#+END_SRC
+** Start/stop postgres on mac  
+  Create an alias in your .zshrc or .bashrc script 
+
+  #+BEGIN_SRC sh
+  # Start/Stop postgresql
+  export PGDATA='/usr/local/var/postgres'
+  export PGHOST=localhost
+  alias postgres_status='pg_ctl -l $PGDATA/server.log status'
+  alias postgres_start='pg_ctl -l $PGDATA/server.log start'
+  alias postgres_stop='pg_ctl -l $PGDATA/server.log stop'
+  alias postgres_restart='pg_ctl -l $PGDATA/server.log reload'  
+  #+END_SRC
+
+** Connect to postgres on mac
+   #+BEGIN_SRC sh
+   $ psql postgres 
+   psql (9.3.1)
+   Type "help" for help.
+   postgres=#
+   #+END_SRC
+
+** Connect to postgres on ubuntu
+   - Postgres creates a user postgres to operate postgres service under
+   - Switch to postgres user
+
+   #+BEGIN_SRC sh
+   $ sudo su - postgres
+   #+END_SRC
+
+** Connect to PSQL as postgres user
+
+   #+BEGIN_SRC sh
+   $ psql 
+   psql (9.3.1)
+   Type "help" for help.
+   
+   postgres=#
+   #+END_SRC
+
+
+* User Management
+- list all users
+
+#+BEGIN_SRC sh
+postgres=# \du
+
+postgres=# \du
+                             List of roles
+ Role name |                   Attributes                   | Member of 
+-----------+------------------------------------------------+-----------
+ postgres  | Superuser, Create role, Create DB, Replication | {}
+
+#+END_SRC
+*** Notice there is one super user with every privilege available.
+
+** Create a new user
+*** Postgres uses roles instead of users for permisson management
+    A new role created has no login privileges. 
+#+BEGIN_SRC sh
+postgres=# CREATE ROLE tstuser;
+postgres=# alter role tstuser with login;
+
+#+END_SRC
+
+** Modify role/user password
+#+BEGIN_SRC sh
+postgres=# \password receipts
+Enter new password: 
+Enter it again: 
+postgres=# \q
+#+END_SRC
+
+** Drop Role
+#+BEGIN_SRC sh
+DROP ROLE tstuser;
+#+END_SRC
+
+* Database Management
+** list all databases
+#+BEGIN_SRC sh
+
+postgres=# \list
+or 
+
+postgres=# \l
+
+                              List of databases
+   Name    | Owner | Encoding |   Collate   |    Ctype    | Access privileges
+-----------+-------+----------+-------------+-------------+-------------------
+ postgres  | kbusi | UTF8     | en_AU.UTF-8 | en_AU.UTF-8 |
+ template0 | kbusi | UTF8     | en_AU.UTF-8 | en_AU.UTF-8 | =c/kbusi         +
+           |       |          |             |             | kbusi=CTc/kbusi
+ template1 | kbusi | UTF8     | en_AU.UTF-8 | en_AU.UTF-8 | =c/kbusi         +
+           |       |          |             |             | kbusi=CTc/kbusi
+(3 rows)
+
+postgres=#
+
+#+END_SRC
+
+** drop a database
+
+#+BEGIN_SRC sh
+
+postgres=# drop database <database_name>;
+DROP DATABASE
+
+#+END_SRC
+
+** create database with owner
+#+BEGIN_SRC sh
+
+postgres=# create database <databasename> with owner <ownername>;
+CREATE DATABASE
+postgres=#
+
+#+END_SRC
+* Grant permissions to databse for a role
+#+BEGIN_SRC sh
+
+grant all on database receiptsdb to receipts;
+
+#+END_SRC
+
+* Quit psql 
+#+BEGIN_SRC sh
+
+\q
+
+#+END_SRC
+
+* Test connection to DB
+  - The -W option says that we will be enterin a password 
+  - The -h options specifies hostname connection over network interface
+
+#+BEGIN_SRC sh
+psql -d <database> -U <username> -h <hostname> -W
+#+END_SRC
+
+
+* Connect to database
+
+   #+BEGIN_SRC sh
+
+       postgres=# \connect <db_name>
+       You are now connected to database ...
+
+   #+END_SRC
+
+
+* List all tables in database
+   #+BEGIN_SRC sh
+
+       postgres=# \dt
+
+   #+END_SRC
+
+* Alter Table Owner
+  #+BEGIN_SRC sh
+  db=# ALTER TABLE <tablename> OWNER TO <username>
+  #Only a superuser may execute the command.
+  #+END_SRC
+
+* Load a csv or tab delimited file of data
+  You need a table to hold the data.
+  Once the table is created, you can load the data file directly into the
+  database.
+
+#+BEGIN_SRC sql
+
+ -- DROP TABLE if Exists and Create New Table
+DROP TABLE IF EXISTS sampleTable CASCADE;
+CREATE TABLE sampleTable(
+field1	INTEGER,
+field2	VARCHAR(250),
+field3	INTEGER,
+);
+
+-- Copy csv data file into table created above
+copy sampleTable from 'absolute_path_to_file_name' delimiter as ',' csv header;
+#+END_SRC
+
+
+* References
+** [[http://www.moncefbelyamani.com/how-to-install-postgresql-on-a-mac-with-homebrew-and-lunchy/][postgres on mac]]
+** [[https://www.digitalocean.com/community/articles/how-to-install-and-use-postgresql-on-ubuntu-12-04][postgres on ubuntu 12]]
+** [[https://www.digitalocean.com/community/articles/how-to-use-roles-and-manage-grant-permissions-in-postgresql-on-a-vps--2][Manage roles and permissions on Postgres]]
+** https://www.tunnelsup.com/setting-up-postgres-on-mac-osx
+** https://stackoverflow.com/questions/7975556/how-to-start-postgresql-server-on-mac-os-x

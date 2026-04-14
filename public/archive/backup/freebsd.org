@@ -1,0 +1,481 @@
+#+SETUPFILE: /Users/kbusi/Devel/org-html-themes/setup/theme-readtheorg-local.setup
+#+TITLE: freebsd notes 
+
+Sys Admin Notes 
+------
+
+* System Administration
+** Install FreeBSD Source Code
+  #+BEGIN_SRC sh
+  svn checkout https://svn.FreeBSD.org/base/releng/10.2 /usr/src
+  #+END_SRC
+  - where the 10.2 is your current release
+  - svn.FreeBSD.org will automatically choose a mirror near you
+
+** Inspect Boot log
+  #+BEGIN_SRC sh
+  $ cat /var/run/dmesg.boot
+  #+END_SRC
+
+
+** Modify default editor from vi to nano
+  #+BEGIN_SRC sh
+  # For C based shell
+  $ setenv EDITOR </path/to/nano>
+  
+  # To find path to nano
+  $ which nano
+  #+END_SRC
+
+
+** Check disk space usage by directory
+  #+BEGIN_SRC sh
+  $ sudo du -hd1 /usr
+  #+END_SRC
+
+
+** Expand Partition to Entire Drive
+   When a VPS is upgraded to a larger instance, the expanded drive is not 
+   recognized by the OS
+  
+   - [[https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/disks-growing.html][Tutorial here]]
+     #+BEGIN_SRC sh
+     $ gpart recover vtbd0
+     $ gpart resize -i 2 vtbd0  # 2=what is shown on gpart show vtbd0
+     $ growfs -y /
+    
+     # Verify extra displace exists
+     $ df -h
+    
+    # Update /etc/fstab
+    #+END_SRC
+
+
+    - On reboot, goes to mountroot prompt
+      #+BEGIN_SRC sh
+      # do a ? to see list of available disks
+      $ ufs:/dev/vtbd0s1 
+      #+END_SRC
+
+
+
+** Edit Crontab
+   #+BEGIN_SRC sh
+   $ crontab -e
+   #+END_SRC
+
+
+
+** View traffic on network interfaces
+
+    #+BEGIN_SRC sh
+      $ systat -ifstat 1
+    #+END_SRC
+
+------
+
+
+* Deploy Python App to FreeBSD Jail
+
+  - Update pkg
+
+    #+BEGIN_SRC sh
+    $ pkg update
+    #+END_SRC
+
+  - Install Dependencies using pkg
+
+    #+BEGIN_SRC sh
+    $ pkg install python
+    $ pkg install py27-pip 
+    $ pkg install sqlite3
+    $ pkg install py27-sqlite3
+    $ pkg install git
+    $ pkg install nano
+    $ pkg install postgresql94-client # so psycopg2 installs using pip
+                                      # Need to specify version ex: 94 
+    $ pkg install nginx
+    $ pkg install py27-supervisor
+    #+END_SRC
+
+  - Install Virtualenv
+
+    #+BEGIN_SRC sh
+    # install virtualenv
+    $ pip install virtualenv
+    
+    #END_SRC
+
+  - Add SSH public key to Bitbucket or Github
+
+    So you can clone the project
+
+
+  - Clone the project to your server
+
+    Ex: Create a /var/www/ directory and clone into there
+
+
+  - Create a virtual env
+
+    I keep my virtualenv inside my project as venv to keep it selfcontained
+
+    #+BEGIN_SRC sh 
+    $ virtualenv --no-site-packages venv
+    # Activate virtual env (not the csh special script)
+    $ source venv/bin/activate.csh
+       #+END_SRC
+
+
+  - Install requirements into virtualenv using pip 
+    
+    Be sure virtual env is active 
+
+    #+BEGIN_SRC sh
+    $ pip install -r requirements.txt
+    #+END_SRC
+
+    - You might get errors if you use uwsgi using pkg b/c virtualenv path
+      wont be recognized. Use pip install uwsgi and run
+      venv/bin/uwsgi --socket 127.0.0.1:8080 --protocol=http -w receiptapp.py
+    - link:https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-applications-using-uwsgi-web-server-with-nginx
+
+
+  - Verify nginx is also running in jail
+    #+BEGIN_SRC sh
+    $ service nginx status
+    Cannot 'status' nginx. Set nginx_enable to YES in /etc/rc.conf or use 'onestatus' instead of 'status'.
+    #+END_SRC
+
+    - On a fresh install of nginx, if you get a message like that
+      - Add nginx_enable="YES" to /etc/defaults/rc.conf
+        #+BEGIN_SRC sh
+        nginx_enable="YES"        
+        #+END_SRC
+
+    - Verify nginx status again
+
+      #+BEGIN_SRC sh
+      service nginx status
+      nginx is not running.      
+      #+END_SRC
+
+    - Start nginx
+
+   - by pointing to default nginx page in jail to verify forwarding works
+
+** Create Postgres user and database
+#+BEGIN_SRC sh
+# swith to pgsql user
+$ su pgsql
+
+# Connect to database
+$ psql template1
+
+OR
+# Connect as root specifying user and database
+$ psql -d template1 -u pgsql
+
+
+# Create user w/ perm to create databases. (man createuser to see options)
+$ createuser -sdrP username 
+
+# Createdb 
+$ createdb <dbname>
+
+# Connect as user create
+$ psql -U <username> -h <hostname> -d <database_name>
+
+#+END_SRC
+
+** Run bootstrap.py 
+** Verify can connect to db and see tables created
+** Make sure app is connecting to correct database by running it locally
+   - activate virtual env
+   - Run python app.py 
+   - should run wihout errors
+
+** Point webserver to nginx in app jail
+
+** Make sure supervisor is installed (py27-supervisor)
+** Start supervisord service
+#+BEGIN_SRC sh
+service supervisord start
+#+END_SRC
+
+** Edit supervisor.conf file in /usr/local/etc/supervisor.conf
+#+BEGIN_SRC sh
+[program:uwsgi_myapp]
+directory=/usr/local/www/myapp/
+command=/usr/local/bin/uwsgi -s /var/run/%(program_name)s%(process_num)d.sock
+        --chmod-socket=666 --need-app --disable-logging --home=venv
+        --wsgi-file wsgi.py --processes 1 --threads 10
+stdout_logfile="syslog"
+stderr_logfile="syslog"
+startsecs=10
+stopsignal=QUIT
+stopasgroup=true
+killasgroup=true
+process_name=%(program_name)s%(process_num)d
+numprocs=5
+#+END_SRC
+
+** Set nginx and supervisor to start on system start
+   - edit /etc/defaults/rc.conf to have (note the defaults b/c its in jail)
+#+BEGIN_SRC sh
+supervisord_enable="YES"
+nginx_enable="YES"
+#+END_SRC
+
+** Edit nginx.conf file to have this include statement in http block
+#+BEGIN_SRC sh
+include /usr/local/etc/nginx/conf.d/*.conf;
+#+END_SRC
+
+** Create conf.d directory if it doesn't exist
+** copy nginx.conf file to /usr/local/etc/nginx/conf.d/
+** Restart nginx, make sure no errors
+** Verify URL works in browser
+
+** Troubleshooting
+*** Check log files
+   - app uwsgi log file specified in ini file first for clues
+   - check nginx error log file 
+
+*** IOError: decoder jpeg not available
+    
+    Use pillow instead of PIL
+    Make sure dependencies for PIL/pillow are installed
+    Remove pillow and reinstall after dependencies installed on OS
+
+    - On Ubuntu, make sure libjpeg8-dev library is installed
+      Uninstall and re-install pillow
+
+    - On FreeBSD
+      #+BEGIN_SRC sh
+      $ pkg search jpeg-8
+      jpeg-8-6
+      $ pkg install jpeg-8_6
+      #+END_SRC
+
+      - Uninstall and reinstall pillow
+      - Test you can create a thumbnail using Python REPL
+        #+BEGIN_SRC sh
+        # python
+        Python 2.7.10 (default, Aug  9 2015, 01:20:33)
+        [GCC 4.2.1 Compatible FreeBSD Clang 3.4.1 (tags/RELEASE_34/dot1-final 208032)] on freebsd10
+        Type "help", "copyright", "credits" or "license" for more information.
+        >>> from PIL import Image
+        >>> im = Image.open('jpeg-file-full-path')
+        >>> im.thumbnail((128,128), Image.ANTIALIAS)        
+        #+END_SRC
+
+
+** Reference: 
+- https://www.srijn.net/notes/django-uwsgi-nginx-on-freebsd.html
+
+- [[https://translate.google.com/translate?u=http://mainview.ru/raznoe/unix/python-image-library-pil-vo-freebsd&langpair=ru|en&ie=UTF8][jpeg decoder on freebsd]]
+------
+
+
+
+
+* FreeBSD Jails
+
+** Manage Jails using ezjail-admin
+---------------------------------
+      #+BEGIN_SRC sh
+        # View list of available jails
+        $ jls
+
+        # or 
+        $ jls -v
+        # Log into existing jail
+        $ sudo ezjail-admin console <jailname>
+
+        # OR use jexec with number parameter where # parameter == JID 
+        # from jls output 
+        $ sudo jexec 2 csh
+
+        # OR use execute a command in jail 
+        $ sudo jexec 1 hostname
+        # show host name of jail with id=1
+
+      #+END_SRC
+
+
+** Create new Jail
+
+   A condensed version of [[http://www.bsdnow.tv/tutorials/jails][bsdnow]]
+
+*** Create an ip address for jail
+   - Find an ipaddress to set for jail
+     
+     Select the next ip address number
+   #+BEGIN_SRC sh
+     $ jls
+   #+END_SRC
+
+
+   - Make an alias on your network card with your network settings
+   #+BEGIN_SRC sh
+     $ sudo ifconfig lo10 alias 10.10.10.15 netmask 0xffffff00
+   #+END_SRC
+
+   - Add network alias to /etc/rc.conf so it remembers on reboot
+   - Your /etc/rc.conf file will look something like this
+   #+BEGIN_SRC sh
+   # Setup Jails
+   ezjail_enable="YES"
+   jail_sysvipc_allow="YES"    # For PostgresSQL
+
+   gateway_enable="YES"
+
+   cloned_interfaces="lo10"
+   ifconfig_lo10_alias0="inet 10.10.10.1 netmask 255.255.255.0"
+   ifconfig_lo10_alias1="inet 10.10.10.10 netmask 255.255.255.0"
+   ifconfig_lo10_alias2="inet 10.10.10.11 netmask 255.255.255.0"
+   ifconfig_lo10_alias3="inet 10.10.10.12 netmask 255.255.255.0"
+   ifconfig_lo10_alias4="inet 10.10.10.13 netmask 255.255.255.0"
+   ifconfig_lo10_alias5="inet 10.10.10.14 netmask 255.255.255.0"
+   ifconfig_lo10_alias6="inet 10.10.10.15 netmask 255.255.255.0"
+   #+END_SRC
+
+   - Create the actual jail
+     - use the ip address created above
+     #+BEGIN_SRC sh          
+     sudo ezjail-admin create busilogic-blog 10.10.10.15    
+     #+END_SRC
+
+   - To enable networking inside jail, copy the resolv.conf file
+     #+BEGIN_SRC sh
+     sudo cp /etc/resolv.conf /usr/jails/busilogic-blog/etc/     
+     #+END_SRC
+
+     - Start the jail
+     #+BEGIN_SRC sh
+     sudo service ezjail start busilogic-blog     
+     #+END_SRC
+
+
+** Enable networking in jail
+---------------------------------
+      #+BEGIN_SRC sh
+        # Replace jail name with your jail created
+        $ cp /etc/resolv.conf /usr/jails/<jailname>/etc/
+      #+END_SRC
+
+
+* Using fetch fails with ssl auth error
+---------------------------------------
+** Reason: Certificate verification failed
+
+    #+BEGIN_SRC sh
+      # Install ca root
+      $ pkg install ca_root_nss
+
+      # Then ln or cp the combined root certificates to /etc/ssl/cert.pem
+      $ ln -s /usr/local/share/certs/ca-root-nss.crt /etc/ssl/cert.pem
+    #+END_SRC
+
+
+* Starting PostGres in jail
+---------------------------
+    #+BEGIN_SRC sh
+      $ su pgsql
+      $ pg_ctl -D /usr/local/pgsql/data initdb /usr/local/bin/pg_ctl -D /usr/local/pgsql/data -l /usr/local/pgsql/postgresql.log start
+    #+END_SRC
+
+
+* Running Ghost
+#+BEGIN_SRC sh
+# set node env
+$ setenv NODE_ENV production
+
+# verify node env set
+$ env  # Should see all environment variables
+
+# Run ghost
+$ npm start
+
+# Run Ghost forever
+$ forever start index.js
+#+END_SRC
+
+
+
+
+* Jenkins
+- https://wiki.jenkins-ci.org/display/JENKINS/FreeBSD
+
+  Setting up Jenkins on freebsd
+
+* References
+------------
+- http://www.bsdnow.tv/tutorials/jails
+- [[https://www.packtpub.com/books/content/securing-network-services-freebsd-jails][Setup new jail with SSH enabled]]
+- https://discuss.vultr.com/discussion/432/adding-more-storage/p1
+- https://forums.freebsd.org/threads/mountroot.46296/
+
+
+
+# - Now update /etc/fstab to use the disk instead of /dev/label/rootfs0
+#  ex: /dev/vtbd0s1
+#  /dev/vtbd0s1            /               ufs     rw,noatime      1       1
+  
+
+# kbusi@lordnibbler:~ % cat /etc/fstab
+# Device                Mountpoint              FStype          Options Dump
+# Pass
+# /dev/label/rootfs0      /               ufs     rw,noatime      1       1
+# /dev/label/swap0        none            swap    sw      0       0
+
+# kbusi@lordnibbler:~ % sudo gpart show vtbd0s1
+# =>       0  41942880  vtbd0s1  BSD  (20G)
+#         0  27355136        1  freebsd-ufs  (13G)
+#  27355136   4096000        2  freebsd-swap  (2.0G)
+#  31451136  10491744           - free -  (5.0G)
+
+# kbusi@lordnibbler:~ % swapoff /dev/label/swap0
+# swapoff: /dev/label/swap0: Operation not permitted
+# kbusi@lordnibbler:~ % sudo swapoff /dev/label/swap0
+# kbusi@lordnibbler:~ % sudo gpart show vtbd0s1
+# =>       0  41942880  vtbd0s1  BSD  (20G)
+#          0  27355136        1  freebsd-ufs  (13G)
+#  27355136   4096000        2  freebsd-swap  (2.0G)
+#  31451136  10491744           - free -  (5.0G)
+
+# kbusi@lordnibbler:~ % sudo gpart delete -i 2 vtbd0s1
+# vtbd0s1b deleted
+# kbusi@lordnibbler:~ % sudo gpart show vtbd0s1
+# =>       0  41942880  vtbd0s1  BSD  (20G)
+#          0  27355136        1  freebsd-ufs  (13G)
+#  27355136  14587744           - free -  (7.0G)
+
+# kbusi@lordnibbler:~ % sudo gpart resize -i 1 0a 4k -s 18G vtbd0s1
+# gpart: Invalid number of arguments.
+# kbusi@lordnibbler:~ % sudo gpart resize -i 1 -a 4k -s 18G vtbd0s1
+# vtbd0s1a resized
+# kbusi@lordnibbler:~ % sudo gpart show vtbd0s1
+# =>       0  41942880  vtbd0s1  BSD  (20G)
+#          0  37748730        1  freebsd-ufs  (18G)
+#  37748730   4194150           - free -  (2.0G)
+
+# kbusi@lordnibbler:~ % sudo gpart add -t freebsd-swap -a 4k vtbd0s1
+# vtbd0s1b added
+# kbusi@lordnibbler:~ % sudo gpart show vtbd0s1
+# =>       0  41942880  vtbd0s1  BSD  (20G)
+#          0  37748730        1  freebsd-ufs  (18G)
+#  37748730   4194144        2  freebsd-swap  (2.0G)
+#  41942874         6           - free -  (3.0K)
+
+# kbusi@lordnibbler:~ % sudo swapon /dev/label/swap0
+# swapon: /dev/label/swap0: No such file or directory
+# kbusi@lordnibbler:~ % sudo swapon /dev/swap0
+# swapon: /dev/swap0: No such file or directory
+# kbusi@lordnibbler:~ % cat /etc/fstab
+# Device                Mountpoint              FStype          Options Dump
+# Pass
+# /dev/label/rootfs0 
+
+- [[https://forums.freebsd.org/threads/building-a-10-2-system-from-source.53069/]]

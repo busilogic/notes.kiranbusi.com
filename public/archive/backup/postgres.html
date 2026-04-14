@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2015-09-24 Thu 13:59 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="viewport" content="width=device-width, initial-scale=1" />
+<title>Postgres notes</title>
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="kiran" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Postgres notes</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgheadline3">1. Installation</a>
+<ul>
+<li><a href="#orgheadline1">1.1. On Ubuntu</a></li>
+<li><a href="#orgheadline2">1.2. On Mac</a></li>
+</ul>
+</li>
+<li><a href="#orgheadline8">2. Connection</a>
+<ul>
+<li><a href="#orgheadline4">2.1. Start/stop postgres on mac</a></li>
+<li><a href="#orgheadline5">2.2. Connect to postgres on mac</a></li>
+<li><a href="#orgheadline6">2.3. Connect to postgres on ubuntu</a></li>
+<li><a href="#orgheadline7">2.4. Connect to PSQL as postgres user</a></li>
+</ul>
+</li>
+<li><a href="#orgheadline14">3. User Management</a>
+<ul>
+<li>
+<ul>
+<li><a href="#orgheadline9">3.0.1. Notice there is one super user with every privilege available.</a></li>
+</ul>
+</li>
+<li><a href="#orgheadline11">3.1. Create a new user</a>
+<ul>
+<li><a href="#orgheadline10">3.1.1. Postgres uses roles instead of users for permisson management</a></li>
+</ul>
+</li>
+<li><a href="#orgheadline12">3.2. Modify role/user password</a></li>
+<li><a href="#orgheadline13">3.3. Drop Role</a></li>
+</ul>
+</li>
+<li><a href="#orgheadline18">4. Database Management</a>
+<ul>
+<li><a href="#orgheadline15">4.1. list all databases</a></li>
+<li><a href="#orgheadline16">4.2. drop a database</a></li>
+<li><a href="#orgheadline17">4.3. create database with owner</a></li>
+</ul>
+</li>
+<li><a href="#orgheadline19">5. Grant permissions to databse for a role</a></li>
+<li><a href="#orgheadline20">6. Quit psql</a></li>
+<li><a href="#orgheadline21">7. Test connection to DB</a></li>
+<li><a href="#orgheadline22">8. Connect to database</a></li>
+<li><a href="#orgheadline23">9. List all tables in database</a></li>
+<li><a href="#orgheadline24">10. Load a csv or tab delimited file of data</a></li>
+<li><a href="#orgheadline28">11. References</a>
+<ul>
+<li><a href="#orgheadline25">11.1. postgres on mac</a></li>
+<li><a href="#orgheadline26">11.2. postgres on ubuntu 12</a></li>
+<li><a href="#orgheadline27">11.3. Manage roles and permissions on Postgres</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<hr  />
+
+<div id="outline-container-orgheadline3" class="outline-2">
+<h2 id="orgheadline3"><span class="section-number-2">1</span> Installation</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-orgheadline1" class="outline-3">
+<h3 id="orgheadline1"><span class="section-number-3">1.1</span> On Ubuntu</h3>
+<div class="outline-text-3" id="text-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">sudo apt-get install postgresql postgresql-contrib
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline2" class="outline-3">
+<h3 id="orgheadline2"><span class="section-number-3">1.2</span> On Mac</h3>
+<div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">brew update 
+brew doctor
+brew install postgres
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline8" class="outline-2">
+<h2 id="orgheadline8"><span class="section-number-2">2</span> Connection</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-orgheadline4" class="outline-3">
+<h3 id="orgheadline4"><span class="section-number-3">2.1</span> Start/stop postgres on mac</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Create an alias in your .zshrc or .bashrc script 
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh"># Start/Stop postgresql
+export PGDATA='/usr/local/var/postgres'
+export PGHOST=localhost
+alias postgres_status='pg_ctl -l $PGDATA/server.log status'
+alias postgres_start='pg_ctl -l $PGDATA/server.log start'
+alias postgres_stop='pg_ctl -l $PGDATA/server.log stop'
+alias postgres_restart='pg_ctl -l $PGDATA/server.log reload'
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline5" class="outline-3">
+<h3 id="orgheadline5"><span class="section-number-3">2.2</span> Connect to postgres on mac</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">$ psql postgres 
+psql (9.3.1)
+Type "help" for help.
+postgres=#
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline6" class="outline-3">
+<h3 id="orgheadline6"><span class="section-number-3">2.3</span> Connect to postgres on ubuntu</h3>
+<div class="outline-text-3" id="text-2-3">
+<ul class="org-ul">
+<li>Postgres creates a user postgres to operate postgres service under</li>
+<li>Switch to postgres user</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">$ sudo su - postgres
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline7" class="outline-3">
+<h3 id="orgheadline7"><span class="section-number-3">2.4</span> Connect to PSQL as postgres user</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">$ psql 
+psql (9.3.1)
+Type "help" for help.
+
+postgres=#
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline14" class="outline-2">
+<h2 id="orgheadline14"><span class="section-number-2">3</span> User Management</h2>
+<div class="outline-text-2" id="text-3">
+<ul class="org-ul">
+<li>list all users</li>
+</ul>
+<div class="org-src-container">
+
+<pre class="src src-sh">postgres=# \du
+
+postgres=# \du
+                             List of roles
+ Role name |                   Attributes                   | Member of 
+-----------+------------------------------------------------+-----------
+ postgres  | Superuser, Create role, Create DB, Replication | {}
+</pre>
+</div>
+</div>
+<div id="outline-container-orgheadline9" class="outline-4">
+<h4 id="orgheadline9"><span class="section-number-4">3.0.1</span> Notice there is one super user with every privilege available.</h4>
+</div>
+
+<div id="outline-container-orgheadline11" class="outline-3">
+<h3 id="orgheadline11"><span class="section-number-3">3.1</span> Create a new user</h3>
+<div class="outline-text-3" id="text-3-1">
+</div><div id="outline-container-orgheadline10" class="outline-4">
+<h4 id="orgheadline10"><span class="section-number-4">3.1.1</span> Postgres uses roles instead of users for permisson management</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<p>
+A new role created has no login privileges. 
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">postgres=# CREATE ROLE tstuser;
+postgres=# alter role tstuser with login;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline12" class="outline-3">
+<h3 id="orgheadline12"><span class="section-number-3">3.2</span> Modify role/user password</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">postgres=# \password receipts
+Enter new password: 
+Enter it again: 
+postgres=# \q
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline13" class="outline-3">
+<h3 id="orgheadline13"><span class="section-number-3">3.3</span> Drop Role</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">DROP ROLE tstuser;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline18" class="outline-2">
+<h2 id="orgheadline18"><span class="section-number-2">4</span> Database Management</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-orgheadline15" class="outline-3">
+<h3 id="orgheadline15"><span class="section-number-3">4.1</span> list all databases</h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">postgres=# \list
+or 
+
+postgres=# \l
+
+                              List of databases
+   Name    | Owner | Encoding |   Collate   |    Ctype    | Access privileges
+-----------+-------+----------+-------------+-------------+-------------------
+ postgres  | kbusi | UTF8     | en_AU.UTF-8 | en_AU.UTF-8 |
+ template0 | kbusi | UTF8     | en_AU.UTF-8 | en_AU.UTF-8 | =c/kbusi         +
+           |       |          |             |             | kbusi=CTc/kbusi
+ template1 | kbusi | UTF8     | en_AU.UTF-8 | en_AU.UTF-8 | =c/kbusi         +
+           |       |          |             |             | kbusi=CTc/kbusi
+(3 rows)
+
+postgres=#
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline16" class="outline-3">
+<h3 id="orgheadline16"><span class="section-number-3">4.2</span> drop a database</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">postgres=# drop database &lt;database_name&gt;;
+DROP DATABASE
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline17" class="outline-3">
+<h3 id="orgheadline17"><span class="section-number-3">4.3</span> create database with owner</h3>
+<div class="outline-text-3" id="text-4-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">postgres=# create database &lt;databasename&gt; with owner &lt;ownername&gt;;
+CREATE DATABASE
+postgres=#
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgheadline19" class="outline-2">
+<h2 id="orgheadline19"><span class="section-number-2">5</span> Grant permissions to databse for a role</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-sh">grant all on database receiptsdb to receipts;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline20" class="outline-2">
+<h2 id="orgheadline20"><span class="section-number-2">6</span> Quit psql</h2>
+<div class="outline-text-2" id="text-6">
+<div class="org-src-container">
+
+<pre class="src src-sh">\q
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline21" class="outline-2">
+<h2 id="orgheadline21"><span class="section-number-2">7</span> Test connection to DB</h2>
+<div class="outline-text-2" id="text-7">
+<ul class="org-ul">
+<li>The -W option says that we will be enterin a password</li>
+<li>The -h options specifies hostname connection over network interface</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">psql -d &lt;database&gt; -U &lt;username&gt; -h &lt;hostname&gt; -W
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline22" class="outline-2">
+<h2 id="orgheadline22"><span class="section-number-2">8</span> Connect to database</h2>
+<div class="outline-text-2" id="text-8">
+<div class="org-src-container">
+
+<pre class="src src-sh">postgres=# \connect &lt;db_name&gt;
+You are now connected to database ...
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline23" class="outline-2">
+<h2 id="orgheadline23"><span class="section-number-2">9</span> List all tables in database</h2>
+<div class="outline-text-2" id="text-9">
+<div class="org-src-container">
+
+<pre class="src src-sh">postgres=# \dt
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline24" class="outline-2">
+<h2 id="orgheadline24"><span class="section-number-2">10</span> Load a csv or tab delimited file of data</h2>
+<div class="outline-text-2" id="text-10">
+<p>
+You need a table to hold the data.
+Once the table is created, you can load the data file directly into the
+database.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sql"> -- DROP TABLE if Exists and Create New Table
+DROP TABLE IF EXISTS sampleTable CASCADE;
+CREATE TABLE sampleTable(
+field1  INTEGER,
+field2  VARCHAR(250),
+field3  INTEGER,
+);
+
+-- Copy csv data file into table created above
+copy sampleTable from 'absolute_path_to_file_name' delimiter as ',' csv header;
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline28" class="outline-2">
+<h2 id="orgheadline28"><span class="section-number-2">11</span> References</h2>
+<div class="outline-text-2" id="text-11">
+</div><div id="outline-container-orgheadline25" class="outline-3">
+<h3 id="orgheadline25"><span class="section-number-3">11.1</span> <a href="http://www.moncefbelyamani.com/how-to-install-postgresql-on-a-mac-with-homebrew-and-lunchy/">postgres on mac</a></h3>
+</div>
+<div id="outline-container-orgheadline26" class="outline-3">
+<h3 id="orgheadline26"><span class="section-number-3">11.2</span> <a href="https://www.digitalocean.com/community/articles/how-to-install-and-use-postgresql-on-ubuntu-12-04">postgres on ubuntu 12</a></h3>
+</div>
+<div id="outline-container-orgheadline27" class="outline-3">
+<h3 id="orgheadline27"><span class="section-number-3">11.3</span> <a href="https://www.digitalocean.com/community/articles/how-to-use-roles-and-manage-grant-permissions-in-postgresql-on-a-vps--2">Manage roles and permissions on Postgres</a></h3>
+</div>
+</div>
+</div>
+</body>
+</html>

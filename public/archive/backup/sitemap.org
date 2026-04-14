@@ -1,0 +1,15 @@
+#+TITLE: Sitemap
+
+   + styles
+     + readtheorg
+       + [[file:styles/readtheorg/readtheorg.org][ReadTheOrg style]]
+   + [[file:git-cheat-sheet.org][Git Cheat Sheet]]
+   + [[file:how-to-create-this-site.org][How to create this site using org mode]]
+   + [[file:theindex.org][Index]]
+   + [[file:design.org][On Design]]
+   + [[file:pgp-with-emacs.org][PGP with Emacs]]
+   + [[file:python.org][Postgres notes]]
+   + [[file:postgres.org][Postgres notes]]
+   + [[file:python3-uwsgi.org][Python 3 Uwsgi]]
+   + [[file:tmux.org][Tmux]]
+   + [[file:freebsd.org][freebsd notes]]
