@@ -96,13 +96,21 @@ The workflow is at `.github/workflows/deploy.yml`. GitHub Pages must be configur
 
 ---
 
+## Analytics
+
+GoatCounter — privacy-respecting, no cookie banner required.
+
+- **Dashboard**: https://notes-kiranbusi.goatcounter.com
+- **Credentials**: in vault `keys/software.md`
+- **Script**: injected in `src/layouts/Base.astro` (in `<head>`)
+
 ## Design
 
 - **Stack**: Astro, static output, no JS framework
 - **Fonts**: Lora (headings), Inter (body), JetBrains Mono (code) via Google Fonts
 - **Colours**: `#FAFAF8` background, `#1A1A1A` ink, `#C17D11` amber accent
 - **Styles**: `src/styles/global.css` — all custom properties defined there
-- **Layout**: `src/layouts/Base.astro` — nav, footer, meta tags
+- **Layout**: `src/layouts/Base.astro` — nav, footer, meta tags, analytics script
 
 ---
 
