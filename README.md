@@ -4,6 +4,36 @@ Personal thought leadership site. Built with [Astro](https://astro.build), deplo
 
 ---
 
+## 🚀 Go-live checklist
+
+Two manual steps required — everything else is already done.
+
+### 1. Enable GitHub Pages (2 minutes)
+
+1. Go to **https://github.com/busilogic/notes.busilogic.com/settings/pages**
+2. Under **Source**, select **GitHub Actions** (not "Deploy from a branch")
+3. Save
+
+The deploy workflow has already run — once Pages is enabled it will serve the build immediately.
+
+### 2. Add DNS record (propagates in ~10–30 minutes)
+
+At your domain registrar (wherever `kiranbusi.com` is registered):
+
+| Type | Host | Value |
+|------|------|-------|
+| CNAME | `notes` | `busilogic.github.io` |
+
+Once DNS propagates, go back to **Settings → Pages** and tick **Enforce HTTPS**.
+
+### Verify
+
+- [ ] https://notes.kiranbusi.com loads the site
+- [ ] https redirects correctly (no certificate warning)
+- [ ] The first post is visible at `/writing`
+
+---
+
 ## Writing a new post
 
 1. Create a file in `src/content/posts/` named `your-post-slug.md`
