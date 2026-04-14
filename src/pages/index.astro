@@ -1,31 +1,32 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import PostCard from '../components/PostCard.astro';
+
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+const posts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()).slice(0, 5);
 ---
 
 <Base
   title="Kiran Busi"
-  description="Principal Consultant in cloud architecture, enterprise AI, and engineering leadership. Writing about what actually happens at the intersection of technology and organisations."
+  description="Principal Consultant in cloud architecture, enterprise AI, and engineering leadership."
 >
   <div class="home-statement">
     <p class="home-statement__lede">
-      I've spent twenty years making technology work in environments where getting it wrong has real consequences — regulated finance, government, healthcare, and more recently universities deploying AI into classrooms.
+      Principal Consultant. Cloud architecture, enterprise AI, engineering leadership.
     </p>
-
-    <p class="home-statement__body">
-      That context shapes everything: security isn't a layer you add later, architecture decisions are also people decisions, and the most important thing an engineer can do is make complexity legible to the people who have to live with it.
-    </p>
-
-    <p class="home-statement__body">
-      Right now I'm running my consulting practice inside an AI operating system I built — not as an experiment, but because it's genuinely better. Every engagement gets its own Claude context. Sessions auto-journal. Nightly synthesis extracts what I learned and feeds it back into how I work the next day. It's compounding in ways a notebook never could.
-    </p>
-
-    <p class="home-statement__body">
-      I write about what I observe at the intersection of cloud architecture, engineering leadership, and the way AI is actually changing how technical work gets done — not in press releases, but in the day-to-day of real engagements.
-    </p>
-
-    <div class="home-links">
-      <a href="/writing">Read the writing →</a>
-      <a href="/system">How I operate →</a>
-    </div>
   </div>
+
+  <ul class="post-list">
+    {posts.map((post) => (
+      <li>
+        <PostCard
+          title={post.data.title}
+          date={post.data.date}
+          description={post.data.description}
+          slug={post.slug}
+        />
+      </li>
+    ))}
+  </ul>
 </Base>
