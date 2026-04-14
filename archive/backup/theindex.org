@@ -1,5 +1,0 @@
-#+SETUPFILE: /Users/kbusi/Devel/org-html-themes/setup/theme-readtheorg-local.setup
-#+TITLE: Index
-
-#+INCLUDE: "theindex.inc"
-
