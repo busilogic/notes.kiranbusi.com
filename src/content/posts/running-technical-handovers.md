@@ -1,6 +1,6 @@
 ---
 title: "The Business Risk Inside Every Technical Departure"
-date: 2026-04-24
+date: 2026-04-10
 description: "A technical handover is not an HR process. By the time you realise it's an operational risk, the knowledge is already gone."
 ---
 
