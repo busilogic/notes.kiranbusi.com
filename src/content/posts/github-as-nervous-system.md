@@ -1,38 +1,47 @@
 ---
-title: "GitHub as the Nervous System"
-date: 2026-04-14
-description: "Why every engagement starts with a repo."
+title: "The Foundational Step Most Teams Skip When Adopting AI"
+date: 2026-04-24
+description: "Most teams are getting a fraction of what they should from AI tools."
 ---
 
-I'm forced to switch context often. I'm being hit with multiple messages from multiple directions. Context switching costs! The way I've managed to cope is using GitHub as the nervous system.  
+Most teams I work with have adopted AI tools. Most people want to be more productive, to focus on higher order work. But the productivity friction isn't tools, models, or prompts. It's context — specifically, the lack of it.
 
-Over the life of a project/engaegement, as work accumulates, decisions made, context shifts and people move on, I started using GitHub as the record.
-In consulting, the value *is* the thinking, and thinking disappears fast.
+## What I keep seeing
 
-The repo fixes that. I try to use it as my general knowledge hub. That way, every decision has a timestamp. Every change can be diffed. Every direction change leaves a trace. It's not documentation you write after but a continuous record of work as it happens.
+Engineers are opening a new AI session, re-explaining the project, re-establishing constraints, re-describing the architecture — and then doing it again the next day. Or they use copilot next to their IDE to pair program. The AI is capable. But it starts from zero every single time. Time is spent feeding AI context instead of getting work done.
 
-## Why it matters for AI
+The smarter engineers figure out workarounds. They paste in chunks of documentation, keep notes they copy in at the start of each session, build their own informal systems. But these are individual habits, not team infrastructure. When the engineer leaves, the system leaves with them.
 
-As I'm using AI more and more, I've learned it helps AI too. AI tools have no memory between sessions. Every time you open a new conversation, you're starting from zero — unless you've built somewhere for the context to live.
+This is the same tribal knowledge problem I see in handovers — knowledge that lives in a person's head instead of a shared system. AI makes it more visible, faster.
 
-The repo helps me solve this problem structurally. With context, decisions already made, noted with the constraints that matter — it all lives in the repo. AI can read from it at the start of every session. It already knows where things stand.
+## The fix is not a new tool
 
-Without that, you're spending the first ten minutes of every session re-establishing context you've already established before. With it, you pick up exactly where you left off. The repo stops being passive storage and becomes the memory layer for everything — human and AI alike.
+When I started running AI-assisted engagements seriously, I made the same mistakes. I had to stop thinking about AI context as a prompt problem and start thinking about it as an infrastructure problem. I started treating GitHub as the team's memory.
 
-## How I set it up
+I started a standard of sorts. Every engagement now gets the same structure from day one. 
+- A `deliverables/` folder for outputs 
+- `notes/` for working material 
+- `memory/` for what the AI needs to know (e.g. decisions made, constraints, architecture, client context) 
+- A single context file at the root that wires it all together and gets read automatically when a session opens.
 
-Every engagement gets the same structure: `deliverables/` for outputs, `notes/` for working material, `memory/` for what the AI needs to know, and a `CLAUDE.md` at the root that wires it all together.
+No re-establishing context. No "remind me where we were." The AI picks up where the last session left off because the context is persistent and shared.
 
-That last file is the important one. It references my identity document at the top — how I think, what I've learned, what I don't do. Below that, the engagement specifics: client context, open decisions, relevant constraints.
+## Why this has to come from leadership
 
-When I open the project, Claude reads it automatically. No re-establishing context. No "remind me where we were."
+Here's what I've observed: engineers left to their own devices will each invent their own system. One uses a shared Notion doc. Another keeps a text file locally. Another just re-prompts from scratch. None of it is transferable, none of it compounds, and none of it survives a team change.
 
-## What it buys
+Getting AI to actually deliver productivity gains at a team level isn't a tooling decision — it's a standards decision. Someone with authority needs to say: this is how we structure context for AI-assisted work, and it lives in the repo alongside the code.
 
-Continuity across sessions — the repo is the memory, because AI tools have none by default.
+That's a five-minute decision with compounding returns. Teams that do it early build on each session. Teams that don't keep starting over.
 
-Decisions as artefacts — when a client asks why we did something, the answer is in the commit history. Not reconstructed from memory months later.
+## What this unlocks
 
-Handoffs that actually work — the repo is the handoff. The context is there. No knowledge extraction required.
+Once context lives in the repo, three things happen.
 
-The repo isn't overhead, it's my nervous system.
+**Continuity across sessions.** Work builds on itself instead of resetting. The productivity gains people expected from AI actually start materialising.
+
+**Decisions as artefacts.** When a stakeholder asks why something was built a certain way, the answer is in the commit history — not reconstructed from memory six months later.
+
+**Handovers that actually work.** The repo is the handoff. The context is there. A new engineer or a new AI session inherits everything without extraction.
+
+The teams I've seen get real value from AI didn't necessarily have the best tools. They had the best context.
