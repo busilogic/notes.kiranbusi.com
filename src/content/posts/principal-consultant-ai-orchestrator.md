@@ -1,27 +1,25 @@
 ---
-title: "My AI Stunt Double: How I Run Six Engagements Without Losing the Thread"
+title: "My AI Stunt Double: How I Run Multiple Engagements Without Losing the Thread"
 date: 2026-05-20
 description: "A private GitHub repo, a plain-text inbox, and Claude as orchestrator. The personal version of the system I recommend to teams."
 draft: false
 ---
 
-I wrote recently about [using GitHub as your team's AI memory](./github-as-nervous-system). The argument was structural: when context lives in the repo instead of someone's head, it compounds instead of evaporating.
-
-This is my personal version of that. The system behind the system.
+I wrote recently about [using GitHub as your team's AI memory](./github-as-nervous-system). The argument was: when context lives in the repo instead of someone's head, it compounds instead of evaporating. This is my personal version of that — the system behind how I operate.
 
 ---
 
 ## The Cost of Context Switching
 
-Email gave everyone instant communication. Messaging made it faster. Now anyone can add something on your plate via email, Teams, Slack, WhatsApp, or a text — and if you're running multiple projects, those interruptions don't just add up, they compound.
+Email gave everyone instant communication. Messaging made it faster. Now anyone can add something to your plate via email, Teams, Slack, WhatsApp, or a text. If you're running multiple projects, those interruptions add up.
 
-At any given time I'm running five or six concurrent engagements. Each one is at a different point. One is in hypercare. One is mid-migration. One is wrapping up and transitioning support to another consultant. One just started and I'm still learning the landscape.
+At any given time I'm running multiple concurrent engagements. Each one is at a different point. One is in hypercare, another in mid-migration and one is wrapping up and transitioning support to another consultant. 
 
-The switching cost is real. When I'm deep in one project and I get a message about a completely different client's deployment issue, I have to context-switch fast — different stack, different contacts, different history, different open questions.
-
-The answer isn't a better to-do app. I needed something that holds the operational layer so I can stay at the strategic layer.
+The switching cost is real. When I'm deep in one project and I get a message about a completely different client's deployment issue, I have to context-switch. Different stack, different contacts, different history and different open questions. To deal with it, I needed something that holds the operational layer so I can stay at the strategic layer.
 
 ## My AI To Do List System
+
+I did what any consultant with too many open tabs would do — built a to-do list. But this one has an AI behind it.
 
 Everything starts with a plain-text file called `inbox.md` in a private GitHub repository.
 
@@ -40,9 +38,7 @@ That's it. It looks like a mess. It's supposed to.
 
 ## The Orchestrator
 
-Once a day — usually in the morning, sometimes at the end of the day — I tell my AI orchestrator to process the inbox.
-
-It reads every item and routes it:
+Once a day — usually in the morning, sometimes at the end of the day — I tell my AI orchestrator to process the inbox. In this case, it's just Claude, but it doesn't have to be. It reads every item and routes it:
 
 - Engagement-specific work → the relevant private GitHub issue for that client
 - Cross-cutting admin → a dedicated admin issue
