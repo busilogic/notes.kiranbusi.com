@@ -1,0 +1,149 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Certifications"
+  description="Professional certifications in AI, cloud architecture, and software engineering."
+>
+  <div class="page-header">
+    <h1 class="page-header__title">Certifications</h1>
+  </div>
+
+  <div class="prose">
+    <p>
+      Professional learning paths and certifications completed to stay current with emerging technologies and industry best practices.
+    </p>
+
+    <hr />
+
+    <div class="cert-section">
+      <h2>Anthropic Academy — Claude Certified Associate (2026)</h2>
+      <p class="cert-meta">
+        Completed all 4 core courses for CCA-F (Claude Certified Associate - Foundations) certification through the Anthropic Academy Claude Partner Network.
+      </p>
+
+      <div class="cert-grid">
+        <div class="cert-card">
+          <img src="/images/certifications/cert1-web.png" alt="Introduction to agent skills certificate" class="cert-image" />
+          <div class="cert-details">
+            <h3>Introduction to agent skills</h3>
+            <p class="cert-date">May 2026</p>
+            <p class="cert-id">Credential: q7bo8j2fac6o</p>
+          </div>
+        </div>
+
+        <div class="cert-card">
+          <img src="/images/certifications/cert2-web.png" alt="Introduction to Model Context Protocol certificate" class="cert-image" />
+          <div class="cert-details">
+            <h3>Introduction to Model Context Protocol</h3>
+            <p class="cert-date">June 2026</p>
+            <p class="cert-id">Credential: ubaftmgn8mfx</p>
+          </div>
+        </div>
+
+        <div class="cert-card">
+          <img src="/images/certifications/cert3-web.png" alt="Building with the Claude API certificate" class="cert-image" />
+          <div class="cert-details">
+            <h3>Building with the Claude API</h3>
+            <p class="cert-date">June 2026</p>
+            <p class="cert-id">Credential: wzbguadxsowz</p>
+          </div>
+        </div>
+
+        <div class="cert-card">
+          <img src="/images/certifications/cert4-web.png" alt="Claude Code in Action certificate" class="cert-image" />
+          <div class="cert-details">
+            <h3>Claude Code in Action</h3>
+            <p class="cert-date">June 2026</p>
+            <p class="cert-id">Credential: zjgr8xd8urs3</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="cert-note">
+        These courses covered foundational AI fluency, production-grade MCP server development, comprehensive API integration, and hands-on Claude Code workflow integration.
+      </p>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .cert-section {
+    margin-top: var(--space-12);
+  }
+
+  .cert-meta {
+    color: var(--ink-muted);
+    font-size: var(--text-base);
+    margin-bottom: var(--space-8);
+  }
+
+  .cert-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-8);
+    margin: var(--space-8) 0;
+  }
+
+  .cert-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cert-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .cert-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cert-details {
+    padding: var(--space-4);
+  }
+
+  .cert-details h3 {
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: var(--space-2);
+    line-height: var(--leading-tight);
+  }
+
+  .cert-date {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+    margin-bottom: var(--space-1);
+  }
+
+  .cert-id {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--ink-faint);
+  }
+
+  .cert-note {
+    margin-top: var(--space-8);
+    padding: var(--space-4);
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 640px) {
+    .cert-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
