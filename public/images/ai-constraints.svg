@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 460" font-family="'Segoe UI', 'Inter', Arial, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L8,3.5 z" fill="#374151"/>
+    </marker>
+    <marker id="arr-red" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L8,3.5 z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1060" height="460" fill="#f9fafb" rx="12"/>
+  <rect x="16" y="16" width="1028" height="428" fill="#ffffff" rx="8" stroke="#e5e7eb" stroke-width="1"/>
+
+  <!-- Title -->
+  <text x="530" y="50" text-anchor="middle" fill="#111827" font-size="15" font-weight="700">Working without a system — four compounding constraints</text>
+
+  <!-- ==================== CONSTRAINT 1: Stateless Sessions ==================== -->
+  <rect x="40" y="72" width="230" height="160" rx="8" fill="#fff7ed" stroke="#f97316" stroke-width="1.5"/>
+  <text x="155" y="97" text-anchor="middle" fill="#c2410c" font-size="12" font-weight="700" letter-spacing="0.5">CONSTRAINT 1</text>
+  <text x="155" y="116" text-anchor="middle" fill="#111827" font-size="13" font-weight="600">AI is session-scoped</text>
+  <line x1="40" y1="124" x2="270" y2="124" stroke="#fed7aa" stroke-width="1"/>
+
+  <!-- Mini session boxes -->
+  <rect x="56" y="134" width="90" height="36" rx="5" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
+  <text x="101" y="148" text-anchor="middle" fill="#6b7280" font-size="10">Session A</text>
+  <text x="101" y="162" text-anchor="middle" fill="#9ca3af" font-size="9">context lost</text>
+
+  <rect x="156" y="134" width="90" height="36" rx="5" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
+  <text x="201" y="148" text-anchor="middle" fill="#6b7280" font-size="10">Session B</text>
+  <text x="201" y="162" text-anchor="middle" fill="#9ca3af" font-size="9">starts cold</text>
+
+  <text x="155" y="196" text-anchor="middle" fill="#6b7280" font-size="11">Every session re-pays</text>
+  <text x="155" y="212" text-anchor="middle" fill="#6b7280" font-size="11">the full context cost.</text>
+
+  <!-- ==================== CONSTRAINT 2: No Project Knowledge ==================== -->
+  <rect x="290" y="72" width="230" height="160" rx="8" fill="#fdf4ff" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="405" y="97" text-anchor="middle" fill="#7e22ce" font-size="12" font-weight="700" letter-spacing="0.5">CONSTRAINT 2</text>
+  <text x="405" y="116" text-anchor="middle" fill="#111827" font-size="13" font-weight="600">No project knowledge</text>
+  <line x1="290" y1="124" x2="520" y2="124" stroke="#e9d5ff" stroke-width="1"/>
+
+  <rect x="306" y="134" width="188" height="52" rx="5" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
+  <text x="400" y="153" text-anchor="middle" fill="#374151" font-size="11" font-family="monospace">copilot "add an endpoint"</text>
+  <text x="400" y="170" text-anchor="middle" fill="#9ca3af" font-size="10">→ Which framework? Which patterns?</text>
+
+  <text x="405" y="206" text-anchor="middle" fill="#6b7280" font-size="11">The AI knows the language.</text>
+  <text x="405" y="222" text-anchor="middle" fill="#6b7280" font-size="11">It doesn't know your project.</text>
+
+  <!-- ==================== CONSTRAINT 3: Compliance Boundary ==================== -->
+  <rect x="540" y="72" width="230" height="160" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="655" y="97" text-anchor="middle" fill="#1d4ed8" font-size="12" font-weight="700" letter-spacing="0.5">CONSTRAINT 3</text>
+  <text x="655" y="116" text-anchor="middle" fill="#111827" font-size="13" font-weight="600">Compliance boundary</text>
+  <line x1="540" y1="124" x2="770" y2="124" stroke="#bfdbfe" stroke-width="1"/>
+
+  <!-- Personal vs Company split -->
+  <rect x="556" y="134" width="84" height="36" rx="5" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
+  <text x="598" y="148" text-anchor="middle" fill="#374151" font-size="10">Personal</text>
+  <text x="598" y="162" text-anchor="middle" fill="#9ca3af" font-size="9">AI subscription</text>
+
+  <line x1="648" y1="152" x2="662" y2="152" stroke="#ef4444" stroke-width="2" stroke-dasharray="3,2"/>
+  <text x="655" y="148" fill="#ef4444" font-size="14" text-anchor="middle">⊘</text>
+
+  <rect x="666" y="134" width="84" height="36" rx="5" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
+  <text x="708" y="148" text-anchor="middle" fill="#374151" font-size="10">Company</text>
+  <text x="708" y="162" text-anchor="middle" fill="#9ca3af" font-size="9">codebase / IP</text>
+
+  <text x="655" y="196" text-anchor="middle" fill="#6b7280" font-size="11">Data governance, licensing,</text>
+  <text x="655" y="212" text-anchor="middle" fill="#6b7280" font-size="11">security — real requirements.</text>
+
+  <!-- ==================== CONSTRAINT 4: Multi-project ==================== -->
+  <rect x="790" y="72" width="230" height="160" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="905" y="97" text-anchor="middle" fill="#15803d" font-size="12" font-weight="700" letter-spacing="0.5">CONSTRAINT 4</text>
+  <text x="905" y="116" text-anchor="middle" fill="#111827" font-size="13" font-weight="600">Multi-project reality</text>
+  <line x1="790" y1="124" x2="1020" y2="124" stroke="#bbf7d0" stroke-width="1"/>
+
+  <rect x="806" y="134" width="70" height="24" rx="4" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
+  <text x="841" y="150" text-anchor="middle" fill="#1d4ed8" font-size="10">Client A</text>
+  <rect x="884" y="134" width="70" height="24" rx="4" fill="#fef9c3" stroke="#fde047" stroke-width="1"/>
+  <text x="919" y="150" text-anchor="middle" fill="#854d0e" font-size="10">Client B</text>
+  <rect x="845" y="164" width="70" height="24" rx="4" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1"/>
+  <text x="880" y="180" text-anchor="middle" fill="#9d174d" font-size="10">Client C</text>
+
+  <text x="905" y="210" text-anchor="middle" fill="#6b7280" font-size="11">No single operational view.</text>
+  <text x="905" y="226" text-anchor="middle" fill="#6b7280" font-size="11">Context switches are expensive.</text>
+
+  <!-- ==================== COMPOUNDING ARROW ==================== -->
+  <text x="530" y="265" text-anchor="middle" fill="#6b7280" font-size="12" font-style="italic">These four constraints don't stack — they compound.</text>
+
+  <!-- Compound effect box -->
+  <rect x="120" y="282" width="820" height="80" rx="8" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+
+  <rect x="144" y="298" width="168" height="46" rx="6" fill="#ffffff" stroke="#fca5a5" stroke-width="1"/>
+  <text x="228" y="316" text-anchor="middle" fill="#374151" font-size="11">Re-explain context</text>
+  <text x="228" y="332" text-anchor="middle" fill="#9ca3af" font-size="10">every session, every project</text>
+
+  <text x="340" y="326" fill="#ef4444" font-size="18">+</text>
+
+  <rect x="364" y="298" width="168" height="46" rx="6" fill="#ffffff" stroke="#fca5a5" stroke-width="1"/>
+  <text x="448" y="316" text-anchor="middle" fill="#374151" font-size="11">Inconsistent AI output</text>
+  <text x="448" y="332" text-anchor="middle" fill="#9ca3af" font-size="10">no shared project conventions</text>
+
+  <text x="560" y="326" fill="#ef4444" font-size="18">+</text>
+
+  <rect x="584" y="298" width="168" height="46" rx="6" fill="#ffffff" stroke="#fca5a5" stroke-width="1"/>
+  <text x="668" y="316" text-anchor="middle" fill="#374151" font-size="11">Compliance risk</text>
+  <text x="668" y="332" text-anchor="middle" fill="#9ca3af" font-size="10">wrong tools, wrong boundary</text>
+
+  <text x="780" y="326" fill="#ef4444" font-size="18">+</text>
+
+  <rect x="804" y="298" width="112" height="46" rx="6" fill="#ffffff" stroke="#fca5a5" stroke-width="1"/>
+  <text x="860" y="316" text-anchor="middle" fill="#374151" font-size="11">Dropped threads</text>
+  <text x="860" y="332" text-anchor="middle" fill="#9ca3af" font-size="10">across engagements</text>
+
+  <!-- Result -->
+  <rect x="220" y="384" width="620" height="44" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="530" y="411" text-anchor="middle" fill="#dc2626" font-size="13" font-weight="600">Setup and re-orientation become significant overhead. The AI is powerful but the system around it is missing.</text>
+</svg>
