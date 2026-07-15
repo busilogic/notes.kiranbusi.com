@@ -2,7 +2,7 @@
 title: "Deploying a Test Azure Landing Zone"
 date: 2026-07-15
 description: "Notes from standing up a full platform landing zone in a sandbox tenant: no pipeline, no EA billing account, just a local Bicep deployment to learn how the pieces fit together."
-draft: true
+draft: false
 ---
 
 ## Introduction
