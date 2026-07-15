@@ -75,7 +75,7 @@ A sandbox doesn't need every bell and whistle the reference architecture ships w
 - **Sentinel**: billed per GB ingested. Turn it on if you're specifically testing the SIEM integration
 - **Multiple regions**: deploy to one region. 
 
-Run `Get-AzurePricingforSolution.ps1` (or the Azure Pricing Calculator manually) against your parameter file before you deploy: it'll price out exactly what you're about to spin up, in your currency and region, so there are no surprises.
+Run a script against the [Azure Retail Prices API](https://gist.github.com/busilogic/022fa6344a8515ab194bdd1cd0aad1bc) (or the Azure Pricing Calculator manually) before you deploy: it'll price out exactly what you're about to spin up, in your currency and region, so there are no surprises.
 
 
 ## How to deploy to your test environment
