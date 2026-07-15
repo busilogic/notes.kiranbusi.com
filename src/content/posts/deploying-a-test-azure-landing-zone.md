@@ -93,9 +93,43 @@ That last column is a hub/spoke shell with no Firewall, no Bastion, no gateways,
 
 2. Create an intermediate root management group directly under Tenant Root Group (this is your actual ALZ root, keep Tenant Root Group itself untouched).
 
-3. Clone an accelerator that deploys a platform landing zone following Microsoft's ALZ best practices, then populate its private, gitignored config file. The prerequisites for any such accelerator boil down to four values: tenant ID, intermediate root management group ID (not Tenant Root Group), subscription ID, and region.
+3. Clone an accelerator that deploys a platform landing zone following Microsoft's ALZ best practices. 
+
+   Populate its private, gitignored config file with prerequisites (at a minimum four values) 
+   
+   - tenant ID
+   - intermediate root management group ID (not Tenant Root Group) 
+   - subscription ID 
+   - region
 
 4. Run a [pre-flight check script](https://gist.github.com/busilogic/73e304de651c04803e0083ac12e28049) first: it validates your PowerShell, Az module, Bicep, and CLI versions, and confirms you actually have the root-scope permissions (elevating and self-assigning Owner if needed) before you waste time on a deployment that's going to fail halfway through.
+
+   Sample output when everything's already in place:
+
+   ```
+   Checking PowerShell version (7.5.2)...
+   OK: PowerShell 7.5.2 meets the minimum (7.0).
+
+   Checking Az PowerShell module version...
+   OK: Az PowerShell 16.0.0 meets the minimum (10.0).
+
+   Checking Azure CLI version...
+   OK: Azure CLI 2.87.0 meets the minimum (2.51).
+
+   Checking Bicep CLI version...
+   OK: Bicep 0.44.1 meets the minimum (0.20).
+
+   All prerequisites confirmed. You're good to deploy.
+   ```
+
+   And when a tool's missing or outdated, it flags exactly what to fix instead of failing partway through a deployment:
+
+   ```
+   Checking Bicep CLI version...
+   WARNING: Bicep CLI not found. Install it: az bicep install
+   Exception: One or more tooling prerequisites are not met. Install/upgrade the
+   flagged tools, restart your shell, and re-run this script.
+   ```
 
 5. Deploy stage by stage with `whatif: true` first, then flip it off once you're confident: management groups, then hub connectivity, then platform management, then platform identity, then policy assignments, then role assignments.
 
