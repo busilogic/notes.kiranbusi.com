@@ -93,7 +93,7 @@ That last column is a hub/spoke shell with no Firewall, no Bastion, no gateways,
 
 2. Create an intermediate root management group directly under Tenant Root Group (this is your actual ALZ root, keep Tenant Root Group itself untouched).
 
-3. Clone the repo and populate a private, gitignored config file with your tenant ID, the intermediate root management group ID (not Tenant Root Group), subscription ID, and region.
+3. Clone an accelerator that deploys a platform landing zone following Microsoft's ALZ best practices, then populate its private, gitignored config file. The prerequisites for any such accelerator boil down to four values: tenant ID, intermediate root management group ID (not Tenant Root Group), subscription ID, and region.
 
 4. Run a [pre-flight check script](https://gist.github.com/busilogic/73e304de651c04803e0083ac12e28049) first: it validates your PowerShell, Az module, Bicep, and CLI versions, and confirms you actually have the root-scope permissions (elevating and self-assigning Owner if needed) before you waste time on a deployment that's going to fail halfway through.
 
