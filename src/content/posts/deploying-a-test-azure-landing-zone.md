@@ -1,5 +1,5 @@
 ---
-title: "Deploying a Test Azure Landing Zone (So I Actually Understand One)"
+title: "Deploying a Test Azure Landing Zone"
 date: 2026-07-15
 description: "Notes from standing up a full platform landing zone in a sandbox tenant — no pipeline, no EA billing account, just a local Bicep deployment to learn how the pieces fit together."
 draft: true
@@ -23,7 +23,7 @@ Deploying it yourself is the fastest way to understand *why* each layer exists, 
 
 ## The setup
 
-Prerequisites: PowerShell 7+, the Az PowerShell module, Bicep CLI, and a tenant where you're Owner at the root (a free trial or personal sandbox subscription works fine — you don't need EA billing to test almost everything).
+Prerequisites: PowerShell 7+, the Az PowerShell module, Bicep CLI, and Owner at the tenant root management group. If you're not already there, a Global Administrator needs to enable **"Access management for Azure resources"** in Microsoft Entra ID first (or have an existing root-scope Owner grant it) — you can't bootstrap root Owner for yourself out of nothing. Once that's enabled:
 
 ```bash
 az login
@@ -58,15 +58,19 @@ Connect-AzAccount
 ./.local/Deploy-Local.ps1 -Step "roles/roleAssignments"
 ```
 
-The ordering matters more than it looks. Later stages consume outputs from earlier ones (things like the hub VNet resource ID, or a management group's full resource ID) via a generated `published-vars.private.json` file. Run them out of order and you'll get a config hash mismatch or a missing-parameter error — which, annoyingly, is also the best way to *feel* the dependency graph rather than just read about it in a diagram.
+The ordering matters more than it looks. Later stages consume outputs from earlier ones (things like the hub VNet resource ID, or a management group's full resource ID) via a generated `published-vars.private.json` file — which only gets populated with real values once a stage actually deploys, so `whatif` dry-runs won't chain into downstream stages the same way. Run a real deployment for a stage before relying on its outputs downstream, and expect a config hash mismatch or missing-parameter error if you run stages out of order — annoyingly, also the best way to *feel* the dependency graph rather than just read about it in a diagram.
 
-By the end of this sequence you have: a management group hierarchy, a hub VNet with firewall rules, a Log Analytics workspace and management resources, a Microsoft Entra / PIM-adjacent identity layer, default ALZ policy assignments inherited down the hierarchy, and RBAC role assignments — all in a tenant that cost nothing beyond compute.
+Role assignments running last in this sequence is deliberate for this harness, not a universal rule — if a policy assignment relies on a managed identity for remediation (`deployIfNotExists`/`modify` effects), that identity needs its RBAC in place before remediation will actually succeed.
 
-## What you can't fully test without EA
+By the end of this sequence you have: a management group hierarchy, a hub VNet with firewall rules, a Log Analytics workspace and management resources, a Microsoft Entra identity layer, default ALZ policy assignments inherited down the hierarchy, and RBAC role assignments.
 
-The one gap: **subscription vending**. Creating brand-new subscriptions via the Microsoft Subscription Alias API needs an Enterprise Agreement billing scope. Everything else — the entire platform landing zone, plus onboarding an *existing* subscription as an application landing zone through the companion vending-machine repo — works end-to-end with `subscriptionAliasEnabled: false` pointed at a subscription you already have.
+Two caveats worth flagging rather than glossing over: PIM eligible role assignments need Microsoft Entra ID P2 (or a bundle like Microsoft 365 E5) — without that licence, test with standard RBAC and skip the PIM-eligibility path. And "no EA" doesn't mean "no cost": Azure Firewall, Bastion, public IPs, and Log Analytics ingestion/retention all bill independently of any workload, so budget for a modest ongoing spend even in a sandbox with nothing deployed on top.
 
-That one substitution is enough to exercise the full flow: hub peering, policy inheritance onto the new subscription, RBAC, budgets and tags — everything except the literal "create a subscription" API call.
+## What you can't fully test without EA or MCA billing
+
+The one real gap: **vending brand-new subscriptions**. The Microsoft Subscription Alias API needs an Enterprise Agreement *or* Microsoft Customer Agreement billing scope — a free/trial subscription can't vend additional subscriptions on its own. Everything else — the entire platform landing zone, plus onboarding an *existing* subscription as an application landing zone through the companion vending-machine repo — works with `subscriptionAliasEnabled: false` pointed at a subscription you already have.
+
+That substitution is enough to exercise management-group placement, inherited policy, hub-spoke peering, RBAC, tags, and budgets on that subscription — as long as the identity doing the deployment also holds the right permissions on both the subscription and the hub (budgets specifically need Cost Management write access). It's "end-to-end onboarding of an existing subscription," not literally everything the accelerator can do.
 
 ## What I actually learned
 
