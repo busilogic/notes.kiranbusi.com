@@ -73,15 +73,18 @@ A sandbox doesn't need every bell and whistle the reference architecture ships w
 
 Run a script against the [Azure Retail Prices API](https://gist.github.com/busilogic/022fa6344a8515ab194bdd1cd0aad1bc) (or the Azure Pricing Calculator manually) before you deploy: it'll price out exactly what you're about to spin up, in your currency and region, so there are no surprises.
 
+Figures below are `australiaeast`, priced in **AUD**. They're the always-on baseline only (deployment/gateway hourly fees you pay regardless of usage), excluding variable/consumption meters (data processed, data transferred, storage, per-operation) which scale with actual usage and are close to zero for an idle test environment.
 
-| Component | Typical platform landing zone (reference architecture) | Test deployment (components skipped) |
-|---|---|---|
-| Azure Firewall | Standard, $1,377.29/mo | Standard, $1,377.29/mo |
-| Azure Bastion | Standard SKU, $302.62/mo | omitted initially, $0 (Basic SKU, $198.22/mo once you flip it on for spoke testing) |
-| VPN Gateway | VpnGw1AZ, $219.10/mo | omitted, $0 |
-| ExpressRoute Gateway | ErGw1AZ, $376.70/mo | omitted, $0 |
-| Public IP | Standard, $5.18/mo | Standard, $5.18/mo |
-| **Total always-on baseline** | **~$2,280.89/mo** | **~$1,382.47/mo initially, ~$1,580.69/mo once Bastion is on for spoke testing** |
+| Component | Typical platform landing zone (reference architecture) | Test deployment (components skipped) | Bare shell (hub/spoke only, no Firewall/Public IP) |
+|---|---|---|---|
+| Azure Firewall | Standard, $1,377.29/mo | Standard, $1,377.29/mo | omitted, $0 |
+| Azure Bastion | Standard SKU, $302.62/mo | omitted initially, $0 (Basic SKU, $198.22/mo once you flip it on for spoke testing) | omitted, $0 |
+| VPN Gateway | VpnGw1AZ, $219.10/mo | omitted, $0 | omitted, $0 |
+| ExpressRoute Gateway | ErGw1AZ, $376.70/mo | omitted, $0 | omitted, $0 |
+| Public IP | Standard, $5.18/mo | Standard, $5.18/mo | omitted, $0 |
+| **Total always-on baseline** | **~$2,280.89/mo** | **~$1,382.47/mo initially, ~$1,580.69/mo once Bastion is on for spoke testing** | **~$0/mo** |
+
+That last column is a hub/spoke shell with no Firewall, no Bastion, no gateways, no public IP: just VNets, peering, NSGs, and route tables. None of those carry a fixed always-on meter in the Retail Prices API, they're billed on data processed/transferred, which is close to zero for an idle sandbox. That makes it effectively free to prove out the management group hierarchy, policy assignments, RBAC, and hub-spoke peering/routing before you spend anything on the networking appliances layered on top.
 
 
 ## How to deploy to your test environment
