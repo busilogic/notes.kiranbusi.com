@@ -5,24 +5,20 @@ description: "Notes from standing up a full platform landing zone in a sandbox t
 draft: false
 ---
 
-## Introduction
 This is a walk through of deployment of an Azure Platform Landing Zone in my personal test environment. 
 
 ## Target Use Case
 - Deploy a greenfield azure platform landing zone to a client environment.
-- For testing, a DevOps engineer will need to deploy a greenfield azure landing zone to play and explore.
-
+- For testing, a DevOps engineer will need to deploy a greenfield azure landing zone to their own environment to play and explore.
 
 ## Azure Platform Landing Zone Overview
 
-When someone thinks about an Azure Landing Zone, they think about what they need to run their workloads in Azure. 
-
-Subscriptions, security logs and vnets. However, it is important to abstract the concepts into 2 layers.
+When someone thinks about an Azure Landing Zone, they think about what they need to run their workloads in Azure. Subscriptions, security logs and vnets. However, it is important to abstract landing zone into 2 layers.
 
 1. Platform Landing Zone
 2. Application Landing Zone
 
-A **platform landing zone** is the centralized layer. Management groups, policy, hub networking, identity, security tooling that every application landing zone needs. 
+The **platform landing zone** is the centralized layer. Management groups, policy, hub networking, identity, security tooling that every application landing zone needs. 
 
 It's not a workload environment. It's the scaffolding.
 - management group hierarchy 
@@ -86,7 +82,7 @@ Run a script against the [Azure Retail Prices API](https://gist.github.com/busil
 
 3. Clone the repo and populate a private, gitignored config file with your tenant ID, the intermediate root management group ID (not Tenant Root Group), subscription ID, and region.
 
-4. Run `Confirm-LandingZonePrerequisites.ps1` (or the equivalent check script) first: it validates your PowerShell, Az module, Bicep, and CLI versions, and confirms you actually have the root-scope permissions before you waste time on a deployment that's going to fail halfway through.
+4. Run a [pre-flight check script](https://gist.github.com/busilogic/73e304de651c04803e0083ac12e28049) first: it validates your PowerShell, Az module, Bicep, and CLI versions, and confirms you actually have the root-scope permissions (elevating and self-assigning Owner if needed) before you waste time on a deployment that's going to fail halfway through.
 
 5. Deploy stage by stage with `whatif: true` first, then flip it off once you're confident: management groups, then hub connectivity, then platform management, then platform identity, then policy assignments, then role assignments.
 
@@ -109,7 +105,7 @@ Management group-scoped deployments don't clean up after themselves the way a re
 
 Once it's running locally move it to GitHub Actions by:
 
-1. **Set up OIDC, not a service principal secret.** Use a script like `Set-GitHubOIDCAppRegistration.ps1` to create an Entra app registration with a federated credential trusting your specific GitHub repo/branch. No client secret to rotate or leak.
+1. **Set up OIDC, not a service principal secret.** Use a [script like this](https://gist.github.com/busilogic/36e2b449a8e3a0457142b0ea23fda004) to create an Entra app registration with a federated credential trusting your specific GitHub repo/environment or branch. No client secret to rotate or leak.
 2. **Mirror the local stages as workflow jobs.** The accelerator should ship `.github/workflows/deploy.yml` as a reusable `workflow_call`: each stage (management groups, firewall, policy, RBAC) becomes its own job or workflow, called in dependency order, the same order you ran manually.
 3. **Use GitHub Environments for approval gates.** Map each deployment stage to a GitHub Environment with required reviewers, so a `whatif` plan posts as a PR check and a human approves before the real deployment runs: same governance model as an ADO pipeline, without needing ADO.
 4. **Keep sandbox-specific parameters out of the repo history.** Store your tenant/subscription IDs as repository or environment secrets/variables, not committed `.bicepparam` values, even in a personal sandbox: it's good practice to carry into a real client repo later.
