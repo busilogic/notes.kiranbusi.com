@@ -73,6 +73,21 @@ A sandbox doesn't need every bell and whistle the reference architecture ships w
 
 Run a script against the [Azure Retail Prices API](https://gist.github.com/busilogic/022fa6344a8515ab194bdd1cd0aad1bc) (or the Azure Pricing Calculator manually) before you deploy: it'll price out exactly what you're about to spin up, in your currency and region, so there are no surprises.
 
+### What this actually costs
+
+Numbers below are the always-on baseline (deployment/gateway hourly fees you pay regardless of usage) for `australiaeast` in AUD, priced with the script above. They exclude variable/consumption meters (data processed, data transferred, storage, per-operation) since those scale with actual usage and are close to zero for an idle test environment.
+
+| Component | Typical platform landing zone (reference architecture) | Test deployment (components skipped) |
+|---|---|---|
+| Azure Firewall | Standard, $1,377.29/mo | Standard, $1,377.29/mo |
+| Azure Bastion | Standard SKU, $302.62/mo | Basic SKU, $198.22/mo |
+| VPN Gateway | VpnGw1AZ, $219.10/mo | omitted, $0 |
+| ExpressRoute Gateway | ErGw1AZ, $376.70/mo | omitted, $0 |
+| Public IP | Standard, $5.18/mo | Standard, $5.18/mo |
+| **Total always-on baseline** | **~$2,280.89/mo** | **~$1,580.69/mo** |
+
+Skipping the gateways and downgrading Bastion cuts the always-on baseline by about 31%. Azure Firewall is now ~87% of what's left, and there's no cheaper SKU to drop to (Basic exists but isn't GA in every region and doesn't support all the rule types you'd want to test policy against). If cost matters more than testing a production-shaped hub, the next lever is dropping the Firewall entirely and using NSGs for a bare sandbox, though at that point you're testing a materially different topology.
+
 
 ## How to deploy to your test environment
 
