@@ -5,75 +5,109 @@ description: "Notes from standing up a full platform landing zone in a sandbox t
 draft: true
 ---
 
-I've reviewed a lot of Azure landing zones as a consultant, but reviewing someone else's architecture and actually deploying one yourself are different levels of understanding. So I set out to stand up a full platform landing zone in a sandbox tenant, using our internal Bicep accelerator, with no pipeline and no Enterprise Agreement billing account in the way. Just me, PowerShell, and a tenant where I have Owner at the root.
+## Introduction
+This is a walk through of deployment of an Azure Platform Landing Zone in my personal test environment. 
 
-This is the reference version of what I did — partly so I don't forget, partly so future-me has a starting point next time.
-
-## Why local, not pipeline
-
-The accelerator is built to run through an Azure DevOps pipeline in a real engagement. But a pipeline is the wrong tool for learning — it hides the sequencing, the parameter flow, and the "why did that fail" moment behind YAML and service connections. The repo ships a `.local/` folder specifically for this: a PowerShell test harness (`Deploy-Local.ps1`) that runs the exact same Bicep orchestration files, in the exact same dependency order, straight from VS Code.
-
-Running locally is sandbox-only by design. You'd never point this at a customer tenant — it's there so an individual engineer can iterate fast without needing pipeline access.
+## Target Use Case
+Typically a new DevOps Engineer needs to deploy a greenfield azure landing zone. 
+Usually, a standard gold plated landing zone following Microsoft Reference Architecture has some baseline components usually stiched together into provide an "accelerator" to speed up deployment and time to market.
 
 ## What a platform landing zone actually is
 
-Worth pinning down before diving into steps: a **platform landing zone** is the centralized layer — management groups, policy, hub networking, identity, security tooling — that every application landing zone sits underneath. It's not a workload environment. It's the scaffolding: the management group hierarchy, the policies inherited down from the root, the hub VNet with firewall and Bastion, the logging and role assignments that make everything else governable.
+When someone thinks about an Azure Landing Zone, they think about what they need to run their workloads in Azure. Subscriptions, security logs and vnets. However, it is important to abstract the concepts of
+- Platform Landing Zone
+- Application Landing Zone
 
-Deploying it yourself is the fastest way to understand *why* each layer exists, because you hit the dependency ordering problem immediately — you cannot create policy assignments before the management groups they attach to exist, and you cannot peer a spoke to a hub that hasn't been deployed yet.
+A **platform landing zone** is the centralized layer. Management groups, policy, hub networking, identity, security tooling that every application landing zone sits on. 
 
-## The setup
+It's not a workload environment. It's the scaffolding. 
+- management group hierarchy 
+- policies inherited down from the root 
+- hub VNet with firewall and Bastion 
+- logging and role assignments that make everything governable.
 
-Prerequisites: PowerShell 7+, the Az PowerShell module, Bicep CLI, and Owner at the tenant root management group. If you're not already there, a Global Administrator needs to enable **"Access management for Azure resources"** in Microsoft Entra ID first (or have an existing root-scope Owner grant it) — you can't bootstrap root Owner for yourself out of nothing. Once that's enabled:
+## Links to popular Azure Platform Landing Zone Accelerators
+
+You don't need to write this from scratch — nobody does. There are a handful of accelerators out there that already package the Microsoft reference architecture into deployable code:
+
+- **[Azure/ALZ-Bicep](https://github.com/Azure/ALZ-Bicep)** — Microsoft's own reference implementation. Modular, well-documented, the closest thing to a "vanilla" ALZ in Bicep.
+- **[Azure/terraform-azurerm-alz](https://github.com/Azure/terraform-azurerm-alz)** — same conceptual architecture, Terraform flavour, if that's your IaC of choice.
+- **[Azure/terraform-azurerm-lz-vending](https://github.com/Azure/terraform-azurerm-lz-vending)** — the subscription vending half, for onboarding application landing zones once the platform is up.
+- **Bicep Registry AVM pattern modules** (`avm/ptn/lz/*`) — Azure Verified Modules are steadily absorbing ALZ patterns as first-class, versioned registry modules.
+- **Insight's internal accelerator** (`azure-landing-zones-bicep`) — the one this post is actually based on. Built on the same reference architecture, with an added local dev harness, PSRule validation, and Insight-specific policy/RBAC conventions layered on top.
+
+Most consultancies land on one of these, then fork or wrap it with their own naming conventions, policies, and pipeline. The underlying shape — management groups, hub networking, policy, identity — is basically the same everywhere. The differences are in the packaging.
+
+## What you need to deploy in a typical greenfield Azure Platform Landing Zone
+
+A "gold plated" greenfield platform landing zone is really a handful of layers stacked in dependency order:
+
+- **Management group hierarchy** — the tree everything else attaches policy and RBAC to (`Platform`, `Landing Zones`, `Sandbox`, `Decommissioned`, etc., under your tenant root).
+- **Custom role definitions** — if the built-in Azure RBAC roles don't fit your operating model.
+- **Hub networking** — a hub VNet, Azure Firewall, Bastion, and (optionally) a VPN or ExpressRoute gateway for on-prem connectivity.
+- **Platform management** — Log Analytics workspace, Azure Monitor, diagnostic settings wired up centrally so every subscription forwards logs to one place.
+- **Platform identity** — Entra ID groups, PIM-eligible roles (licensing permitting), conditional access baselines.
+- **Policy** — the ALZ default policy initiative assignments, plus any custom definitions and exemptions your organisation needs.
+- **Role assignments** — RBAC tying identities to management groups/subscriptions.
+- **DNS** — private DNS zones for private endpoints, conditional forwarders if you're hybrid.
+
+Everything downstream — application landing zones, workloads — sits on top of this and inherits policy and connectivity from it. Get this layer wrong and you're fixing it at the management group level for every subscription underneath, which is exactly the kind of thing you want to get right once in a test environment before it's real.
+
+## How to get them
+
+For the Insight accelerator specifically:
 
 ```bash
-az login
-az role assignment create \
-  --assignee $(az account show --query user.name -o tsv) \
-  --role Owner \
-  --scope /
-```
-
-Clone the repo, and set up a private, gitignored config file — this is the one place your tenant ID, management group ID, and subscription ID live, and it never gets committed:
-
-```bash
-git clone <the-alz-bicep-repo>
+git clone https://github.com/Insight-Services-APAC/azure-landing-zones-bicep
 cd azure-landing-zones-bicep
-cp .local/config/deploy-local.private.json.example .local/config/deploy-local.private.json
 ```
 
-The config drives everything: your name/email (used for tagging), the target tenant/MG/subscription, the region, and — critically — a `whatif` flag. Leave that `true` for the first pass. Every deployment becomes a dry run until you're confident enough to flip it.
+If you're using Microsoft's own ALZ-Bicep instead, same idea — clone it, read the `docs/` folder for the module list, and check the accompanying wiki for the parameter files you'll need to fill in. Either way, don't deploy straight from `main`. Fork it or clone it into your own repo so you can commit your sandbox-specific parameter values without ever touching upstream.
 
-## Deploying it, one stage at a time
+## How to deploy to your test environment
 
-The harness will run everything in one shot (`-Step AllSteps`), but the first time through, I deployed stage by stage so I could actually watch what each layer produced:
+Covered the mechanics of this earlier in this post — the short version:
 
-```powershell
-Connect-AzAccount
+1. Get Owner at the tenant root (via a Global Admin enabling "Access management for Azure resources," or an existing root-scope Owner granting it to you).
+2. Clone the repo and populate a private, gitignored config file with your tenant ID, management group ID, subscription ID, and region.
+3. Run `Confirm-LandingZonePrerequisites.ps1` (or the equivalent check script) first — it validates your PowerShell, Az module, Bicep, and CLI versions, and confirms you actually have the root-scope permissions before you waste time on a deployment that's going to fail halfway through.
+4. Deploy stage by stage with `whatif: true` first, then flip it off once you're confident: management groups → hub connectivity → platform management → platform identity → policy assignments → role assignments.
 
-./.local/Deploy-Local.ps1 -Step ManagementGroups
-./.local/Deploy-Local.ps1 -Step "platform/platformConnectivity-hub"
-./.local/Deploy-Local.ps1 -Step "platform/platformManagement"
-./.local/Deploy-Local.ps1 -Step "platform/platformIdentity"
-./.local/Deploy-Local.ps1 -Step "policy/alzDefaultPolicyAssignments"
-./.local/Deploy-Local.ps1 -Step "roles/roleAssignments"
-```
+Stage by stage the first time round is worth the extra ten minutes — it's how you actually see the dependency chain rather than just deploying a wall of resources and hoping.
 
-The ordering matters more than it looks. Later stages consume outputs from earlier ones (things like the hub VNet resource ID, or a management group's full resource ID) via a generated `published-vars.private.json` file — which only gets populated with real values once a stage actually deploys, so `whatif` dry-runs won't chain into downstream stages the same way. Run a real deployment for a stage before relying on its outputs downstream, and expect a config hash mismatch or missing-parameter error if you run stages out of order — annoyingly, also the best way to *feel* the dependency graph rather than just read about it in a diagram.
+## What to omit to save costs
 
-Role assignments running last in this sequence is deliberate for this harness, not a universal rule — if a policy assignment relies on a managed identity for remediation (`deployIfNotExists`/`modify` effects), that identity needs its RBAC in place before remediation will actually succeed.
+A sandbox doesn't need every bell and whistle the reference architecture ships with. Things I'd skip or downsize for a personal test tenant:
 
-By the end of this sequence you have: a management group hierarchy, a hub VNet with firewall rules, a Log Analytics workspace and management resources, a Microsoft Entra identity layer, default ALZ policy assignments inherited down the hierarchy, and RBAC role assignments.
+- **Azure Firewall Premium** — the Standard SKU is enough to prove the pattern; Premium's TLS inspection and IDPS add cost you don't need for learning.
+- **VPN/ExpressRoute gateways** — unless you're specifically testing hybrid connectivity, skip these. They bill hourly whether you use them or not.
+- **Defender for Cloud paid plans** — the free tier (CSPM foundational) is enough to see policy and posture data; the paid per-resource plans add up fast across a full landing zone.
+- **Multiple Bastion instances / Standard SKU Bastion** — Basic SKU or just Basic Bastion in the hub is plenty for a lab.
+- **Sentinel** — genuinely useful, genuinely billed per GB ingested. Turn it on only if you're specifically testing the SIEM integration, and turn off ingestion again once you're done.
+- **Multiple regions** — deploy to one region. Multi-region is a scale concern, not a "do I understand the pattern" concern.
 
-Two caveats worth flagging rather than glossing over: PIM eligible role assignments need Microsoft Entra ID P2 (or a bundle like Microsoft 365 E5) — without that licence, test with standard RBAC and skip the PIM-eligibility path. And "no EA" doesn't mean "no cost": Azure Firewall, Bastion, public IPs, and Log Analytics ingestion/retention all bill independently of any workload, so budget for a modest ongoing spend even in a sandbox with nothing deployed on top.
+Run `Get-AzurePricingforSolution.ps1` (or the Azure Pricing Calculator manually) against your parameter file before you deploy — it'll price out exactly what you're about to spin up, in your currency and region, so there are no surprises.
 
-## What you can't fully test without EA or MCA billing
+## How to tear it down
 
-The one real gap: **vending brand-new subscriptions**. The Microsoft Subscription Alias API needs an Enterprise Agreement *or* Microsoft Customer Agreement billing scope — a free/trial subscription can't vend additional subscriptions on its own. Everything else — the entire platform landing zone, plus onboarding an *existing* subscription as an application landing zone through the companion vending-machine repo — works with `subscriptionAliasEnabled: false` pointed at a subscription you already have.
+Management group–scoped deployments don't clean up after themselves the way a resource group does — there's no single `az group delete` that removes everything. Tear-down needs to happen in reverse dependency order:
 
-That substitution is enough to exercise management-group placement, inherited policy, hub-spoke peering, RBAC, tags, and budgets on that subscription — as long as the identity doing the deployment also holds the right permissions on both the subscription and the hub (budgets specifically need Cost Management write access). It's "end-to-end onboarding of an existing subscription," not literally everything the accelerator can do.
+1. Remove policy assignments and any custom definitions/exemptions first — you can't delete a management group with active assignments attached.
+2. Remove RBAC role assignments.
+3. Delete resource groups containing hub networking, monitoring, and identity resources (`az group delete --name <rg> --yes --no-wait` works fine for this, run in parallel).
+4. Delete any subscriptions you vended for testing (or move them back out of the management group hierarchy if they're existing subscriptions you don't actually own).
+5. Delete the management groups themselves, working from the leaves up to (but not including) the tenant root.
+6. Double check Log Analytics workspaces and Key Vaults — both soft-delete by default, and will keep quietly costing you (or at least cluttering your tenant) unless purged explicitly.
 
-## What I actually learned
+Worth scripting this once as a `Deploy-Local.ps1 -TearDown` equivalent rather than doing it by hand every time — you'll be spinning this sandbox up and down more than once while you're learning it.
 
-Reading the conceptual architecture diagram (hub-spoke, or Virtual WAN if you go that route) makes the shape of a landing zone obvious. Deploying it makes the *ordering* obvious — and ordering is where real engagements go wrong. Policy assignments failing because a management group isn't fully propagated yet. A spoke peering attempt firing before the hub's outputs exist. None of that shows up on a whiteboard.
+## How to automate it so it runs from GitHub (not your personal PC)
 
-If you're doing this yourself: start with `whatif: true`, deploy stage by stage the first time, and don't skip reading the generated `published-vars` file between steps — it's the clearest picture you'll get of how a platform landing zone actually wires itself together.
+Running it locally is great for learning the sequencing. It's the wrong place for it to live long-term — nobody wants their sandbox landing zone tied to whether their laptop is switched on. Once you're comfortable with the flow, move it to GitHub Actions:
+
+1. **Set up OIDC, not a service principal secret.** Use a script like `Set-GitHubOIDCAppRegistration.ps1` to create an Entra app registration with a federated credential trusting your specific GitHub repo/branch. No client secret to rotate or leak.
+2. **Mirror the local stages as workflow jobs.** The accelerator already ships `.github/workflows/deploy.yml` as a reusable `workflow_call` — each stage (management groups, firewall, policy, RBAC) becomes its own job or workflow, called in dependency order, the same order you ran manually.
+3. **Use GitHub Environments for approval gates.** Map each deployment stage to a GitHub Environment with required reviewers, so a `whatif` plan posts as a PR check and a human approves before the real deployment runs — same governance model as an ADO pipeline, without needing ADO.
+4. **Keep sandbox-specific parameters out of the repo history.** Store your tenant/subscription IDs as repository or environment secrets/variables, not committed `.bicepparam` values, even in a personal sandbox — it's good practice to carry into a real client repo later.
+
+Once this is wired up, "redeploy my sandbox landing zone" becomes a `workflow_dispatch` button, not a laptop with the right PowerShell modules installed. That's the point where it stops being a one-off learning exercise and starts being infrastructure you can actually rely on to test changes against.
