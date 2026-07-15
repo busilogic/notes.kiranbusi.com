@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 460" font-family="'Segoe UI', 'Inter', Arial, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L8,3.5 z" fill="#374151"/>
+    </marker>
+    <marker id="arr-red" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L8,3.5 z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="460" fill="#f9fafb" rx="12"/>
+  <rect x="16" y="16" width="868" height="428" fill="#ffffff" rx="8" stroke="#e5e7eb" stroke-width="1"/>
+
+  <!-- Title -->
+  <text x="450" y="46" text-anchor="middle" fill="#111827" font-size="15" font-weight="700">Management group hierarchy: intermediate root, not Tenant Root Group</text>
+
+  <!-- Tenant Root Group -->
+  <rect x="330" y="66" width="240" height="56" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="450" y="88" text-anchor="middle" fill="#b91c1c" font-size="12" font-weight="700">Tenant Root Group</text>
+  <text x="450" y="105" text-anchor="middle" fill="#6b7280" font-size="10">permanent, tenant-wide blast radius</text>
+  <text x="450" y="117" text-anchor="middle" fill="#9ca3af" font-size="9">leave policy-free where possible</text>
+
+  <!-- arrow down to intermediate root -->
+  <line x1="450" y1="122" x2="450" y2="156" stroke="#374151" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Intermediate Root MG -->
+  <rect x="320" y="158" width="260" height="56" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="450" y="180" text-anchor="middle" fill="#1d4ed8" font-size="12" font-weight="700">Intermediate Root (e.g. "sandbox")</text>
+  <text x="450" y="197" text-anchor="middle" fill="#6b7280" font-size="10">this is where ALZ policy actually attaches</text>
+
+  <!-- branch line down then out to 4 children -->
+  <line x1="450" y1="214" x2="450" y2="238" stroke="#374151" stroke-width="1.5"/>
+  <line x1="180" y1="238" x2="720" y2="238" stroke="#374151" stroke-width="1.5"/>
+  <line x1="180" y1="238" x2="180" y2="256" stroke="#374151" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="400" y1="238" x2="400" y2="256" stroke="#374151" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="600" y1="238" x2="600" y2="256" stroke="#374151" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="720" y1="238" x2="720" y2="256" stroke="#374151" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Platform -->
+  <rect x="110" y="258" width="140" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="180" y="280" text-anchor="middle" fill="#15803d" font-size="12" font-weight="700">Platform</text>
+  <text x="180" y="296" text-anchor="middle" fill="#6b7280" font-size="9">hub, mgmt, identity</text>
+
+  <!-- Landing Zones -->
+  <rect x="330" y="258" width="140" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="400" y="280" text-anchor="middle" fill="#15803d" font-size="12" font-weight="700">Landing Zones</text>
+  <text x="400" y="296" text-anchor="middle" fill="#6b7280" font-size="9">corp / online subs</text>
+
+  <!-- Sandbox -->
+  <rect x="530" y="258" width="140" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="600" y="280" text-anchor="middle" fill="#15803d" font-size="12" font-weight="700">Sandbox</text>
+  <text x="600" y="296" text-anchor="middle" fill="#6b7280" font-size="9">experimentation</text>
+
+  <!-- Decommissioned -->
+  <rect x="650" y="258" width="140" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="720" y="280" text-anchor="middle" fill="#15803d" font-size="12" font-weight="700">Decommissioned</text>
+  <text x="720" y="296" text-anchor="middle" fill="#6b7280" font-size="9">retired subs</text>
+
+  <!-- caption / why box -->
+  <rect x="40" y="336" width="820" height="92" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="450" y="358" text-anchor="middle" fill="#92400e" font-size="12" font-weight="700">Why not attach Platform/Landing Zones/Sandbox directly under Tenant Root Group?</text>
+  <text x="450" y="378" text-anchor="middle" fill="#78350f" font-size="10.5">Policy assigned at Tenant Root Group applies tenant-wide, forever, to everything, including subscriptions</text>
+  <text x="450" y="394" text-anchor="middle" fill="#78350f" font-size="10.5">you haven't created yet. An intermediate root group scopes the blast radius, and gives you one management</text>
+  <text x="450" y="410" text-anchor="middle" fill="#78350f" font-size="10.5">group you can delete to tear the whole sandbox down, without ever having touched the true tenant root.</text>
+</svg>
